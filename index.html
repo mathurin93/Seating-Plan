@@ -139,6 +139,35 @@
 
 <body class="bg-black text-zinc-300 h-screen flex flex-col font-sans">
 
+<!--    
+    <div id="eventOverlay"
+        class="fixed inset-0 bg-black/70 backdrop-blur-lg z-[999] hidden opacity-0 transition-opacity duration-500 flex items-center justify-center p-6">
+    
+        <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-2xl max-w-md w-full text-center">
+    
+            <h2 class="text-2xl font-bold text-purple-400 mb-2">
+                A Night of Honor
+            </h2>
+    
+            <p class="text-zinc-300 text-sm mb-5">
+                Visit the official event website for full details.
+            </p>
+    
+           
+            <a href="#" id="openEventWebsiteBtn"
+                class="block w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-full transition shadow-md mb-4">
+                Open Event Website
+            </a>
+    
+            
+            <button onclick="closeEventOverlay()" class="text-zinc-400 hover:text-zinc-200 text-sm transition">
+                Close
+            </button>
+    
+        </div>
+    </div> -->
+
+
     <header class="bg-zinc-900 shadow-lg z-30 flex-none border-b border-zinc-800">
         <div class="max-w-md mx-auto px-4 py-4">
             <h1 class="text-xl font-bold text-center text-zinc-100 mb-2">Seating Plan</h1>
@@ -222,6 +251,31 @@
     </div>
 
     <script>
+    // function openEventOverlay() {
+    //     const overlay = document.getElementById("eventOverlay");
+    //     overlay.classList.remove("hidden");
+    //     setTimeout(() => overlay.classList.remove("opacity-0"), 10);
+    // }
+
+    // function closeEventOverlay() {
+    //     const overlay = document.getElementById("eventOverlay");
+    //     overlay.classList.add("opacity-0");
+    //     setTimeout(() => overlay.classList.add("hidden"), 400);
+    // }
+
+    // window.addEventListener("load", () => {
+    //     setTimeout(openEventOverlay, 600);
+    // });
+
+    // // Prevent default behavior and close the overlay
+    //     document.getElementById("openEventWebsiteBtn").addEventListener("click", (e) => {
+    //         e.preventDefault(); // Prevents page refresh
+    //         closeEventOverlay(); // Close the overlay
+    //     });
+
+
+
+
         // --- Data: Tables & Guests ---
         const tablesData = [
             // Head Table - Position changed to 'stage'
@@ -243,7 +297,7 @@
             { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Treleven Marva", "Wisdom Sandra"] },
 
             // Row 1 (Top Left)
-            { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blackstock Denton", "Blackstock Venise", "Bryan Leonard", "Bryan Petronal", "Cousins Christine", "Cousins Marcel", "Guthrie Barbara", "Maxwell Kenneth", "McLaughlin Ivy", "McLaughlin Sonia"] },
+            { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blackstock Denton", "Blackstock Venise", "Bryan Leonard", "Bryan Petronah", "Cousins Christine", "Cousins Marcel", "Guthrie Barbara", "Maxwell Kenneth", "McLaughlin Ivy", "McLaughlin Sonia"] },
 
             // Row 2 (Left)
             { id: 7, type: 'circle', pos: 'r2-c3', guests: ["Baptiste Delores", "Coppin Chileta", "Goodridge Angela", "Jackson Marcia", "Levy Ann Marie", "Levy Loyton", "Lewis Edward", "Mckoy Paulette", "Pitters Yvette", "Rattray Valerie"] },
@@ -273,7 +327,7 @@
             { id: 15, type: 'circle', pos: 'r3-c6', guests: ["Foster Justin", "Fraser Jalesa", "Fraser Jason", "Gordon Brandi", "Hackett Felicia", "Manhertz Brittney", "Manhertz Michael", "Robinson Bethany", "Robinson Mathurin", "Wisdom Corey"] },
 
             // Row 4 (Right)
-            { id: 16, type: 'circle', pos: 'r4-c6', guests: ["Anderson Brittan", "Anderson Keana", "Lynch Josiah", "Lynch Samantha", "Mushett Andrew", "Foster Jaida", "James Darius", "Lake Toriyah", "Wesley Jada"] },
+            { id: 16, type: 'circle', pos: 'r4-c6', guests: ["Anderson Brittanya", "Anderson Keana", "Lynch Josiah", "Lynch Samantha", "Mushett Andrew", "Foster Jaida", "James Darius", "Lake Toriyah", "Wesley Jada"] },
 
             // Row 3 (Left)
             { id: 17, type: 'circle', pos: 'r3-c4', guests: ["Blagrove Carol", "Blagrove Maurice", "Byfield Althea", "Byfield Devon", "Green Dawn", "Green Howard", "Mitchell Dion", "Mitchell Kedisha", "Rose Althea", "Rose Denrick"] },
