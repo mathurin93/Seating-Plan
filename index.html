@@ -7,8 +7,7 @@
     <title>Reception Seating Plan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom Scrollbar for the map container */
-       /* Custom Scrollbar for the map container */
+/* Custom Scrollbar for the map container */
 .map-container {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
@@ -97,42 +96,43 @@
 
 /* --- MOBILE-SPECIFIC LAYOUT AND SPACING (Max 768px) --- */
 @media (max-width: 768px) {
+
+    /* ✅ MERGED floor-grid rules (no duplicates) */
     .floor-grid {
-        grid-template-rows: repeat(14, 1fr); /* Shrinks grid height */
-        max-height: 650px; /* Optional: cap background size */
-        overflow: hidden; /* Prevent stretch from internal content */
-    }
-    body {
-        overflow-x: hidden !important; /* Prevent Safari side-scroll */
-    }
-    #modalOverlay {
-        overflow-x: hidden !important; /* Prevent horizontal scroll entirely */
-    }
-
-
-
-    .floor-grid {
-        gap: 10px; /* Increased spacing between tables */
+        grid-template-rows: repeat(14, 1fr); /* Tightened background */
+        max-height: 650px; /* Prevent long background */
+        overflow: hidden; /* Prevent stretch */
+        gap: 10px;
         width: calc(100vw - 2rem - 8px);
         height: auto;
         min-width: 350px;
         padding: 10px;
     }
 
+    /* ✅ Prevent iPhone horizontal scroll */
+    html {
+        overflow-x: hidden !important;
+    }
+
+    #modalOverlay {
+        overflow-x: hidden !important;
+    }
+
+    /* ✅ Larger tables on mobile */
     .table-circle {
-        transform: scale(1.15); /* Larger circles */
+        transform: scale(1.15);
     }
 
     .table-rect {
         height: 80% !important;
     }
 
-    /* ✅ Add space below Buffet (static element #1) */
+    /* ✅ Add space below Buffet */
     .floor-area:nth-child(1) {
         margin-bottom: 12px;
     }
 
-    /* ✅ Add spacing between the two entrances (static elements #5 and #6) */
+    /* ✅ Spacing between entrances */
     .floor-area:nth-child(5),
     .floor-area:nth-child(6) {
         margin-left: 4px;
