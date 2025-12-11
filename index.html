@@ -102,6 +102,12 @@
         max-height: 650px; /* Optional: cap background size */
         overflow: hidden; /* Prevent stretch from internal content */
     }
+    body {
+        overflow-x: hidden !important; /* Prevent Safari side-scroll */
+    }
+    #modalOverlay {
+        overflow-x: hidden !important; /* Prevent horizontal scroll entirely */
+    }
 
 
 
@@ -744,21 +750,32 @@
             }
 
             function highlightTable(tableId) {
-                switchView('map');
-                document.querySelectorAll('.highlighted').forEach(el => el.classList.remove('highlighted'));
+                    switchView('map');
 
-                const el = document.querySelector(`div[data-id="${tableId}"]`);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
-                    el.classList.add('highlighted');
+                    document.querySelectorAll('.highlighted')
+                        .forEach(el => el.classList.remove('highlighted'));
 
+                    const el = document.querySelector(`div[data-id="${tableId}"]`);
+                    if (!el) return;
+
+                    const table = tablesData.find(t => t.id == tableId);
+
+                    // Smooth scroll first
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+                    // ✅ Delay highlight for Android
                     setTimeout(() => {
-                        const table = tablesData.find(t => t.id == tableId);
-                        if (table) openModal(table);
-                        el.classList.remove('highlighted');
-                    }, 1500);
+                        el.classList.add('highlighted');
+
+                        // Remove highlight + open modal
+                        setTimeout(() => {
+                            el.classList.remove('highlighted');
+                            if (table) openModal(table);
+                        }, 1500);
+
+                    }, 300);
                 }
-            }
+
 
             // View Toggle
             const btnMap = document.getElementById('btnMap');
