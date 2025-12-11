@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reception Seating Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Scrollbar for the map container */
+        .map-container {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .map-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Table Shapes */
+        .table-circle {
+            border-radius: 50%;
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .table-rect {
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Animations */
+        @keyframes pulse-highlight {
+            0% {
+                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
+                transform: scale(1);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(168, 85, 247, 0);
+                transform: scale(1.1);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+                transform: scale(1);
+            }
+        }
+
+        .highlighted {
+            background-color: #a855f7 !important;
+            /* Purple-500 */
+            color: white !important;
+            border-color: #a855f7 !important;
+            animation: pulse-highlight 1.5s infinite;
+            z-index: 20;
+        }
+
+        /* Floor Elements (Updated for Dark Theme) */
+        .floor-area {
+            background-color: #3f3f46;
+            /* Zinc-700 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4d4d8;
+            /* Zinc-200 */
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            border: 2px solid #52525b;
+            /* Zinc-600 */
+        }
+
+        /* Grid Layout for the Map - Updated background for Dark Theme */
+        .floor-grid {
+            display: grid;
+            grid-template-columns: repeat(14, 1fr);
+            grid-template-rows: repeat(18, 1fr);
+            gap: 10px;
+            width: 900px;
+            height: 900px;
+            background-color: #18181b;
+            /* Zinc-900 */
+            border: 2px solid #27272a;
+            /* Zinc-800 */
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Mobile Scale Wrapper */
+        .scale-wrapper {
+            width: 100%;
+            overflow: auto;
+            position: relative;
+        }
+
+        /* --- MOBILE-SPECIFIC LAYOUT AND SIZING (Max 768px) --- */
+        @media (max-width: 768px) {
+
+            /* Add padding to the main map view container */
+            .mobile-padded-view {
+                padding: 1rem;
+                /* Added padding */
+            }
+
+            .floor-grid {
+                gap: 5px;
+                /* Reduce gap for closer tables and bigger appearance */
+                /* Use calc to adjust for the 1rem (16px) padding on the left and right */
+                width: calc(100vw - 2rem - 8px);
+                height: auto;
+                /* Let height adjust based on content */
+                min-width: 350px;
+                /* Ensure a minimum size */
+                padding: 10px;
+            }
+
+            .table-circle {
+                transform: scale(1.15);
+                /* Visually increase circle size by 15% */
+            }
+
+            .table-rect {
+                /* Ensure rectangular tables also look larger */
+                height: 80% !important;
+                /* Adjusted height due to tighter rows on mobile */
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-black text-zinc-300 h-screen flex flex-col font-sans">
+
+    <header class="bg-zinc-900 shadow-lg z-30 flex-none border-b border-zinc-800">
+        <div class="max-w-md mx-auto px-4 py-4">
+            <h1 class="text-xl font-bold text-center text-zinc-100 mb-2">Seating Plan</h1>
+
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Search for a guest..."
+                    class="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm shadow-sm transition-all">
+                <svg class="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+
+                <div id="searchResults"
+                    class="absolute top-full left-0 right-0 mt-1 bg-zinc-800 rounded-lg shadow-xl border border-zinc-700 hidden max-h-60 overflow-y-auto z-50">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow relative overflow-hidden flex flex-col">
+
+        <div class="md:hidden flex justify-center py-2 space-x-4 bg-zinc-950 border-b border-zinc-800">
+            <button id="btnMap"
+                class="px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors">Map
+                View</button>
+            <button id="btnList"
+                class="px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700">Table
+                List</button>
+        </div>
+
+        <div class="relative flex-grow overflow-hidden">
+
+            <!-- Added mobile-padded-view class for padding on small screens -->
+            <div id="mapView"
+                class="w-full h-full overflow-auto bg-zinc-950 flex justify-center p-0 md:p-4 mobile-padded-view">
+                <div class="scale-wrapper flex justify-center">
+                    <div id="floorPlan" class="floor-grid shadow-lg rounded-xl">
+                    </div>
+                </div>
+            </div>
+
+            <div id="listView" class="absolute inset-0 bg-zinc-950 z-20 overflow-y-auto hidden p-4 pb-20">
+                <h2 class="text-lg font-bold mb-4 px-2 text-zinc-100">All Tables</h2>
+                <div id="listContainer" class="grid gap-3 grid-cols-1">
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="modalOverlay"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div id="modalContent"
+            class="bg-zinc-900 w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300 flex flex-col max-h-[85vh]">
+
+            <div
+                class="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-purple-900/20 rounded-t-2xl">
+                <div>
+                    <h3 class="text-xl font-bold text-zinc-100" id="modalTitle">Table 1</h3>
+                    <p class="text-xs text-purple-400 font-medium uppercase tracking-wider mt-0.5">Guest List</p>
+                </div>
+                <button id="closeModal"
+                    class="p-2 bg-zinc-800 rounded-full text-zinc-400 hover:text-zinc-200 shadow-sm hover:shadow transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto">
+                <ul id="modalGuestList" class="space-y-2">
+                </ul>
+            </div>
+
+            <div class="p-4 border-t border-zinc-800 bg-zinc-950 rounded-b-2xl text-center text-xs text-zinc-500">
+                Reception Seating
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data: Tables & Guests ---
+        const tablesData = [
+            // Head Table - Position changed to 'stage'
+            { id: 'HT', label: 'Head Table', type: 'rect', pos: 'stage', guests: ["Brown David", "Brown Melleta"] },
+
+            // Row 2 (Bottom Right)
+            { id: 1, type: 'rect', pos: 'r2-c7', guests: ["Brown Claud", "Edwards Gervan", "Edwards Marlene", "Ford Claudeth", "Linton Josephine", "Linton-Brown Jea", "Saunders Cynthia", "Broomes Janan", "Roban Victor"] },
+
+            // Row 1 (Top Right)
+            { id: 2, type: 'circle', pos: 'r1-c7', guests: ["Brown Deta", "Hackett Noel", "Hackett Oliven", "Henry Walcott", "Hibbert Melvina", "Lewis George", "Lynch Sofia", "Mcleod Eva", "Reid Dexter", "Reid Shirley"] },
+
+            // Row 2 (Right)
+            { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Beckford Antonei", "Brown Charmaine", "Brown Errol", "Cole Avery", "Cole Brielle", "Cole Keaton", "Hackett Ann-Mari", "Hackett Radcliffe", "Hackett Vianne"] },
+
+            // Row 1 (Top Right)
+            { id: 4, type: 'circle', pos: 'r1-c6', guests: ["Graham Diana", "Graham Paul", "Johnson Delroy", "Johnson June", "Reynolds Pauline", "Severin Barbara", "Williams Bill", "Williams Janet"] },
+
+            // Row 2 (Left)
+            { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Treleven Marva", "Wisdom Sandra"] },
+
+            // Row 1 (Top Left)
+            { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blackstock Denton", "Blackstock Venise", "Bryan Leonard", "Bryan Petronal", "Cousins Christine", "Cousins Marcel", "Guthrie Barbara", "Maxwell Kenneth", "McLaughlin Ivy", "McLaughlin Sonia"] },
+
+            // Row 2 (Left)
+            { id: 7, type: 'circle', pos: 'r2-c3', guests: ["Baptiste Delores", "Coppin Chileta", "Goodridge Angela", "Jackson Marcia", "Levy Ann Marie", "Levy Loyton", "Lewis Edward", "Mckoy Paulette", "Pitters Yvette", "Rattray Valerie"] },
+
+            // Row 1 (Top Left)
+            { id: 8, type: 'circle', pos: 'r1-c3', guests: ["Blair Dwayne", "Blair Patricia", "Butler Leroy", "Butler Wendy", "Douglas Gary", "Douglas Priscilla", "Ricketts Chase", "Ricketts Melonie", "Rose Andrew", "Rose Brenda"] },
+
+            // Row 2 (Left)
+            { id: 9, type: 'circle', pos: 'r2-c2', guests: ["Anderson Nicole", "Anderson Ralston", "Griffith Ann-Mari", "Griffith Marlon", "Hunte Leroy", "Hunte Maureen", "Smith Alicia", "Smith Gary", "Spence Ezekiel", "Spence Lincoln"] },
+
+            // Row 1 (Top Left)
+            { id: 10, type: 'circle', pos: 'r1-c2', guests: ["Clemeston Doree", "Clemeston Miche", "Comrie Clive", "Duncan Clarence", "Duncan Lydia", "James Loralee", "Lorray Elizabeth", "Smith Desline", "Walsh Clifford"] },
+
+            // Row 2 (Left)
+            { id: 11, type: 'circle', pos: 'r2-c1', guests: ["Barrett Kingsley", "Barrett Lillian", "Dawns Dawn", "Ford Donna", "Lambert Sheril", "Marcia Clarke", "Peart Angie", "Peart Percy", "Williams Pauline", "Graham David"] },
+
+            // Row 1 (Top Left)
+            { id: 12, type: 'circle', pos: 'r1-c1', guests: ["Clemeston Kristine", "Clemeston Nazheme", "Gordon Janet", "Gordon Leroy", "Johnson Cara", "Longmore Daniel", "Lorray Sarah", "Williams Emma", "Peart Marc"] },
+
+            // Row 3 (Right)
+            { id: 13, type: 'rect', pos: 'r3-c7', guests: ["Brown Laurie Ann", "Brown Vanessa", "Foster Odette", "James Aria", "James Desmond", "James Jayna", "James Natasha", "Sargeant Omari", "Sargeant Deborah"] },
+
+            // Row 4 (Right)
+            { id: 14, type: 'circle', pos: 'r4-c7', guests: ["Davis Cherell", "Davis Robert", "Foster Goldwyn", "Foster Jason", "Foster Shimyka", "Hibbert John Jr.", "Maxwell Noreen", "Newell Simone", "Reid Judeth"] },
+
+            // Row 3 (Right)
+            { id: 15, type: 'circle', pos: 'r3-c6', guests: ["Foster Justin", "Fraser Jalesa", "Fraser Jason", "Gordon Brandi", "Hackett Felicia", "Manhertz Brittney", "Manhertz Michael", "Robinson Bethany", "Robinson Mathurin", "Wisdom Corey"] },
+
+            // Row 4 (Right)
+            { id: 16, type: 'circle', pos: 'r4-c6', guests: ["Anderson Brittan", "Anderson Keana", "Lynch Josiah", "Lynch Samantha", "Mushett Andrew", "Foster Jaida", "James Darius", "Lake Toriyah", "Wesley Jada"] },
+
+            // Row 3 (Left)
+            { id: 17, type: 'circle', pos: 'r3-c4', guests: ["Blagrove Carol", "Blagrove Maurice", "Byfield Althea", "Byfield Devon", "Green Dawn", "Green Howard", "Mitchell Dion", "Mitchell Kedisha", "Rose Althea", "Rose Denrick"] },
+
+            // Row 4 (Left)
+            { id: 18, type: 'circle', pos: 'r4-c4', guests: ["Antonette Scott", "Dalton Scott", "Dixon Donovan", "Kelly Ian", "Kelly Nicole", "Lee Peter", "Soprano Scott", "Thompson Charmaine", "Wallace Shawn", "Young-Dixon Sanja"] },
+
+            // Row 3 (Left)
+            { id: 19, type: 'circle', pos: 'r3-c3', guests: ["Bennett Ricardo", "Cubitt Mark", "Cubitt Michelle", "Hall Kerryann", "Hall Michael", "Halstead Kirk", "Halstead Nadine", "St. Louis Anthony", "St. Louis Michelle", "Wallace-Bennett L"] },
+
+            // Row 4 (Left)
+            { id: 20, type: 'circle', pos: 'r4-c3', guests: ["Anderson Tanesha", "Bell Angélique", "Comrie Allison", "Comrie Sherry", "Duff Christopher", "Graham Latoya", "Graham Latoya", "Lake Nathania", "Treleven Susie"] },
+
+            // Row 3 (Left)
+            { id: 21, type: 'circle', pos: 'r3-c2', guests: ["Ann Marie Thom", "Edwards-Ledger", "George Tashieka", "Jameson Verness", "Ledger Jeffrey", "McKoy Audley", "McKoy Geisell", "McKoy Ramona", "Rodney Roxan", "Winsome Wesley"] },
+
+            // Row 4 (Left)
+            { id: 22, type: 'circle', pos: 'r4-c2', guests: ["Clarke Ronjay", "Clarke Sashane", "Gordon Shari", "Jameson Verness", "Lynch Marseenia", "Olivierre Kelton", "Olivierre Sigri", "Solomon Caitlyn", "Solomon Shanne"] },
+
+            // Row 3 (Left)
+            { id: 23, type: 'circle', pos: 'r3-c1', guests: ["Byfield Nathaniel", "Byfield Rennae", "Chambers Matti", "Hibbert Maquetia", "Hibbert Mark", "Nichols Joanna", "Nichols O'Brian", "Rose Ricardo", "Severin David"] },
+
+            // Row 4 (Left)
+            { id: 24, type: 'circle', pos: 'r4-c1', guests: ["Clarke Adriel", "Clarke Yashime", "Douglas Diondra", "Douglas Diandra", "Hibbert Maquetia", "Kayla McLean", "Lake Yosephine", "Cousins Christopher", "Cousins Lydia", "Cousins Samantha", "Phillip McLean"] }
+        ];
+
+        // --- Configuration & DOM ---
+        const floorPlan = document.getElementById('floorPlan');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalContent = document.getElementById('modalContent');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+
+        // CSS Grid mapping matching the image logic (DEFAULT/DESKTOP)
+        // Grid is 14 cols x 18 rows. Tables span 2 grid rows vertically.
+        // --- POS MAPS ---
+
+            const posMapDesktop = {
+                // R1: 2/4
+                'r1-c1': 'grid-area: 2 / 2 / 4 / 4;', // Table 12
+                'r1-c2': 'grid-area: 2 / 4 / 4 / 6;', // Table 10
+                'r1-c3': 'grid-area: 2 / 6 / 4 / 8;', // Table 8
+                'r1-c4': 'grid-area: 2 / 8 / 4 / 10;', // Table 6
+
+                'r1-c6': 'grid-area: 2 / 11 / 4 / 13;', // Table 4
+                'r1-c7': 'grid-area: 2 / 13 / 4 / 15;', // Table 2
+
+                // R2: 5/7 (Gap: R4)
+                'r2-c1': 'grid-area: 5 / 2 / 7 / 4;', // Table 11
+                'r2-c2': 'grid-area: 5 / 4 / 7 / 6;', // Table 9
+                'r2-c3': 'grid-area: 5 / 6 / 7 / 8;', // Table 7
+                'r2-c4': 'grid-area: 5 / 8 / 7 / 10;', // Table 5
+
+                'r2-c6': 'grid-area: 5 / 11 / 7 / 13;', // Table 3
+                'r2-c7': 'grid-area: 5 / 13 / 7 / 15;', // Table 1 (Rect)
+
+                // R3: 9/11 (Gap: R7, R8)
+                'r3-c1': 'grid-area: 9 / 2 / 11 / 4;', // Table 23
+                'r3-c2': 'grid-area: 9 / 4 / 11 / 6;', // Table 21
+                'r3-c3': 'grid-area: 9 / 6 / 11 / 8;', // Table 19
+                'r3-c4': 'grid-area: 9 / 8 / 11 / 10;', // Table 17
+
+                'r3-c6': 'grid-area: 9 / 11 / 11 / 13;', // Table 15
+                'r3-c7': 'grid-area: 9 / 13 / 11 / 15;', // Table 13 (Rect)
+
+                // R4: 12/14 (Gap: R11)
+                'r4-c1': 'grid-area: 12 / 2 / 14 / 4;', // Table 24
+                'r4-c2': 'grid-area: 12 / 4 / 14 / 6;', // Table 22
+                'r4-c3': 'grid-area: 12 / 6 / 14 / 8;', // Table 20
+                'r4-c4': 'grid-area: 12 / 8 / 14 / 10;', // Table 18
+
+                'r4-c6': 'grid-area: 12 / 11 / 14 / 13;', // Table 16
+                'r4-c7': 'grid-area: 12 / 13 / 14 / 15;', // Table 14
+            };
+
+            // --- MOBILE-SPECIFIC POSITIONS (Max 768px) ---
+            const posMapMobile = {
+                // R1: 2/4 (No change)
+                'r1-c1': 'grid-area: 2 / 2 / 4 / 4;',
+                'r1-c2': 'grid-area: 2 / 4 / 4 / 6;',
+                'r1-c3': 'grid-area: 2 / 6 / 4 / 8;',
+                'r1-c4': 'grid-area: 2 / 8 / 4 / 10;',
+                'r1-c6': 'grid-area: 2 / 11 / 4 / 13;',
+                'r1-c7': 'grid-area: 2 / 13 / 4 / 15;',
+
+                // R2: 4/6 (Shifted up 1 row - Closer to R1)
+                'r2-c1': 'grid-area: 4 / 2 / 6 / 4;', // Table 11
+                'r2-c2': 'grid-area: 4 / 4 / 6 / 6;',
+                'r2-c3': 'grid-area: 4 / 6 / 6 / 8;',
+                'r2-c4': 'grid-area: 4 / 8 / 6 / 10;',
+                'r2-c6': 'grid-area: 4 / 11 / 6 / 13;',
+                'r2-c7': 'grid-area: 4 / 13 / 6 / 15;',
+
+                // R3: 8/10 (Shifted up 1 row - Maintains space from R2)
+                'r3-c1': 'grid-area: 8 / 2 / 10 / 4;', // Table 23
+                'r3-c2': 'grid-area: 8 / 4 / 10 / 6;',
+                'r3-c3': 'grid-area: 8 / 6 / 10 / 8;',
+                'r3-c4': 'grid-area: 8 / 8 / 10 / 10;',
+                'r3-c6': 'grid-area: 8 / 11 / 10 / 13;',
+                'r3-c7': 'grid-area: 8 / 13 / 10 / 15;',
+
+                // R4: 10/12 (Shifted up 2 rows - Closer to R3)
+                'r4-c1': 'grid-area: 10 / 2 / 12 / 4;', // Table 24
+                'r4-c2': 'grid-area: 10 / 4 / 12 / 6;',
+                'r4-c3': 'grid-area: 10 / 6 / 12 / 8;',
+                'r4-c4': 'grid-area: 10 / 8 / 12 / 10;',
+                'r4-c6': 'grid-area: 10 / 11 / 12 / 13;',
+                'r4-c7': 'grid-area: 10 / 13 / 12 / 15;',
+            };
+
+
+            // --- Functions ---
+function getLayoutConfig() {
+    const isMobile = window.innerWidth <= 768;
+    let config = {};
+
+    // Shared color palette for static elements (Zinc shades)
+    const ZINC_700 = '#3f3f46';
+    const ZINC_600 = '#52525b';
+    const ZINC_200 = '#d4d4d8';
+    const ZINC_400 = '#a1a1aa';
+
+    if (isMobile) {
+        // Mobile Configuration
+        config.posMap = posMapMobile;
+        config.htStyle = 'grid-area: 4 / 15 / 10 / 16; writing-mode: vertical-rl;';
+
+        config.staticElements = [
+            // Buffet
+            {
+                name: 'Buffet',
+                style: `grid-area: 1 / 3 / 2 / 9;
+                background-color: ${ZINC_700};
+                color: ${ZINC_200};
+                border: 2px solid ${ZINC_600};`
+            },
+
+            // Foyer (already moved down + narrowed)
+            {
+                name: 'Foyer',
+                style: `grid-area: 14 / 9 / 16 / 16;
+                margin-bottom: 12px;
+                width: 80%;
+                justify-self: center;
+                background-color: ${ZINC_600};
+                color: ${ZINC_200};
+                font-size: 1rem;
+                border: 2px solid ${ZINC_600};`
+            },
+
+            // Bar — mobile stays where you set it
+            {
+                name: 'Bar',
+                style: `grid-area: 12 / 4 / 13 / 9;
+                margin-bottom: 8px;
+                background-color: ${ZINC_700};
+                color: ${ZINC_200};
+                border: 2px solid ${ZINC_600};`
+            },
+
+            // Reception — NOW WITH BORDER (mobile)
+            {
+                name: 'Reception',
+                style: `grid-area: 13 / 4 / 14 / 9;
+                margin-top: 4px;
+                height: 15px;
+                font-size: 0.6rem;
+                background-color: transparent;
+                color: ${ZINC_400};
+                border: 1px solid ${ZINC_400};`
+            },
+
+            // Entrances
+            {
+                name: 'Entrance (Below Bar)',
+                style: `grid-area: 17 / 2 / 18 / 9;
+                background: #27272a;
+                color: white;
+                border: 1px solid white;`
+            },
+            {
+                name: 'Entrance (Below Foyer)',
+                style: `grid-area: 17 / 9 / 18 / 15;
+                background: #27272a;
+                color: white;
+                border: 1px solid white;`
+            },
+        ];
+
+    } else {
+        // Desktop Configuration
+        config.posMap = posMapDesktop;
+        config.htStyle = 'grid-area: 5 / 15 / 11 / 16; writing-mode: vertical-rl;';
+
+        config.staticElements = [
+            // Buffet
+            {
+                name: 'Buffet',
+                style: `grid-area: 1 / 3 / 2 / 9;
+                background-color: ${ZINC_700};
+                color: ${ZINC_200};
+                border: 2px solid ${ZINC_600};`
+            },
+
+            // Bar moved DOWN a bit (previously row 14 → now row 15)
+            {
+                name: 'Bar',
+                style: `grid-area: 15 / 4 / 16 / 9;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                background-color: ${ZINC_700};
+                color: ${ZINC_200};
+                border: 2px solid ${ZINC_600};`
+            },
+
+            // Reception — NOW WITH BORDER (desktop)
+            {
+                name: 'Reception',
+                style: `grid-area: 16 / 4 / 17 / 9;
+                margin-top: 4px;
+                height: 15px;
+                font-size: 0.6rem;
+                background-color: transparent;
+                color: ${ZINC_400};
+                border: 1px solid ${ZINC_400};`
+            },
+
+            // Foyer (same position — stays above entrances)
+            {
+                name: 'Foyer',
+                style: `grid-area: 15 / 9 / 16 / 16;
+                margin-top: 8px;
+                margin-bottom: 12px;
+                width: 80%;
+                justify-self: center;
+                background-color: ${ZINC_600};
+                color: ${ZINC_200};
+                font-size: 1rem;
+                border: 2px solid ${ZINC_600};`
+            },
+
+            // Entrances
+            {
+                name: 'Entrance (Below Bar)',
+                style: `grid-area: 17 / 2 / 18 / 9;
+                background: #27272a;
+                color: white;
+                border: 1px solid white;`
+            },
+            {
+                name: 'Entrance (Below Foyer)',
+                style: `grid-area: 17 / 9 / 18 / 15;
+                background: #27272a;
+                color: white;
+                border: 1px solid white;`
+            },
+        ];
+    }
+
+    return config;
+}
+
+
+            function renderMap() {
+                // Clear existing
+                floorPlan.innerHTML = '';
+
+                const { posMap, staticElements, htStyle } = getLayoutConfig();
+
+                // Add Static Floor Elements (Buffet, Bar, Foyer, Entrances, etc.)
+                staticElements.forEach(el => {
+                    const div = document.createElement('div');
+                    div.className = 'floor-area shadow-sm rounded';
+                    div.style = el.style;
+                    div.innerText = el.name;
+                    floorPlan.appendChild(div);
+                });
+
+                // Add Tables
+                tablesData.forEach(table => {
+                    const el = document.createElement('div');
+                    el.dataset.id = table.id;
+                    el.addEventListener('click', () => openModal(table));
+
+                    // Special handling for Head Table
+                    if (table.id === 'HT') {
+                        el.style.cssText += htStyle;
+                        el.className = 'table-rect bg-purple-700 border-2 border-purple-500 text-white font-bold text-base shadow-lg cursor-pointer hover:border-white hover:bg-purple-600';
+                        el.style.width = '100%';
+                        el.style.height = '100%';
+                        el.innerText = table.label;
+                        floorPlan.appendChild(el);
+                        return;
+                    }
+
+                    // Regular tables (circle or rect)
+                    if (table.type === 'circle') {
+                        el.className = 'table-circle bg-zinc-800 border-2 border-zinc-700 text-purple-400 font-bold text-lg shadow-md cursor-pointer hover:border-purple-500 hover:text-purple-300';
+                    } else {
+                        el.className = 'table-rect bg-zinc-800 border-2 border-zinc-700 text-purple-400 font-bold text-lg shadow-md cursor-pointer hover:border-purple-500 hover:text-purple-300';
+                        el.style.width = '100%';
+                        if (window.innerWidth > 768) {
+                            el.style.height = '60%';
+                        }
+                    }
+
+                    // Apply grid placement
+                    if (posMap[table.pos]) {
+                        el.style.cssText += posMap[table.pos];
+                        el.innerText = table.label ? table.label : table.id;
+                        floorPlan.appendChild(el);
+                    }
+                });
+            }
+
+            function renderListView() {
+                const container = document.getElementById('listContainer');
+                container.innerHTML = '';
+                tablesData
+                    .slice()
+                    .sort((a, b) => {
+                        if (a.id === 'HT') return -1;
+                        if (b.id === 'HT') return 1;
+                        return (a.id - b.id);
+                    })
+                    .forEach(table => {
+                        const card = document.createElement('div');
+                        card.className = 'bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:bg-zinc-800 transition-colors cursor-pointer';
+                        card.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-bold text-lg text-purple-400">${table.label || 'Table ' + table.id}</span>
+                    <span class="text-xs text-zinc-400 bg-zinc-800 px-2 py-1 rounded-full">${table.guests.length} Guests</span>
+                </div>
+                <p class="text-sm text-zinc-400 truncate">${table.guests.join(', ')}</p>
+            `;
+                        card.addEventListener('click', () => openModal(table));
+                        container.appendChild(card);
+                    });
+            }
+
+            function openModal(table) {
+                document.getElementById('modalTitle').innerText = table.label || `Table ${table.id}`;
+                const list = document.getElementById('modalGuestList');
+                list.innerHTML = '';
+
+                table.guests.forEach(guest => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center space-x-3 py-2 border-b border-zinc-800 last:border-0';
+                    li.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-purple-900/40 flex items-center justify-center text-purple-400 font-bold text-xs">
+                ${guest.charAt(0)}
+            </div>
+            <span class="text-zinc-200 font-medium">${guest}</span>
+        `;
+                    list.appendChild(li);
+                });
+
+                modalOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    modalOverlay.classList.remove('opacity-0');
+                    modalContent.classList.remove('translate-y-full');
+                }, 10);
+            }
+
+            function closeModalFn() {
+                modalOverlay.classList.add('opacity-0');
+                modalContent.classList.add('translate-y-full');
+                setTimeout(() => {
+                    modalOverlay.classList.add('hidden');
+                }, 300);
+            }
+
+            function handleSearch(e) {
+                const term = e.target.value.toLowerCase();
+                searchResults.innerHTML = '';
+
+                if (term.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+
+                const results = [];
+                tablesData.forEach(table => {
+                    table.guests.forEach(guest => {
+                        if (guest.toLowerCase().includes(term)) {
+                            results.push({ guest, table });
+                        }
+                    });
+                });
+
+                if (results.length > 0) {
+                    searchResults.classList.remove('hidden');
+                    results.forEach(res => {
+                        const div = document.createElement('div');
+                        div.className = 'px-4 py-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-900 last:border-0';
+                        div.innerHTML = `
+                <div class="font-medium text-zinc-100">${res.guest}</div>
+                <div class="text-xs text-purple-400 font-bold">${res.table.label || 'Table ' + res.table.id}</div>
+            `;
+                        div.addEventListener('click', () => {
+                            highlightTable(res.table.id);
+                            searchResults.classList.add('hidden');
+                            searchInput.value = '';
+                        });
+                        searchResults.appendChild(div);
+                    });
+                } else {
+                    const noResult = document.createElement('div');
+                    noResult.className = 'px-4 py-3 text-sm text-zinc-500 italic';
+                    noResult.innerText = `No results found for "${term}"`;
+                    searchResults.appendChild(noResult);
+                    searchResults.classList.remove('hidden');
+                }
+            }
+
+            function highlightTable(tableId) {
+                switchView('map');
+                document.querySelectorAll('.highlighted').forEach(el => el.classList.remove('highlighted'));
+
+                const el = document.querySelector(`div[data-id="${tableId}"]`);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
+                    el.classList.add('highlighted');
+
+                    setTimeout(() => {
+                        const table = tablesData.find(t => t.id == tableId);
+                        if (table) openModal(table);
+                        el.classList.remove('highlighted');
+                    }, 1500);
+                }
+            }
+
+            // View Toggle
+            const btnMap = document.getElementById('btnMap');
+            const btnList = document.getElementById('btnList');
+            const mapView = document.getElementById('mapView');
+            const listView = document.getElementById('listView');
+
+            function switchView(view) {
+                if (view === 'map') {
+                    mapView.classList.remove('hidden');
+                    listView.classList.add('hidden');
+                    btnMap.className = "px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors";
+                    btnList.className = "px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700";
+                } else {
+                    mapView.classList.add('hidden');
+                    listView.classList.remove('hidden');
+                    btnMap.className = "px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700";
+                    btnList.className = "px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors";
+                }
+            }
+
+            // Event Listeners
+            document.getElementById('closeModal').addEventListener('click', closeModalFn);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModalFn();
+            });
+            searchInput.addEventListener('input', handleSearch);
+            btnMap.addEventListener('click', () => switchView('map'));
+            btnList.addEventListener('click', () => switchView('list'));
+
+            window.addEventListener('resize', renderMap);
+
+            // Init
+            renderMap();
+            renderListView();
+
+
+    </script>
+</body>
+
+</html>
