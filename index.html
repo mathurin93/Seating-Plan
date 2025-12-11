@@ -8,135 +8,132 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom Scrollbar for the map container */
-        .map-container {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
-        }
+       /* Custom Scrollbar for the map container */
+.map-container {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
 
-        .map-container::-webkit-scrollbar {
-            display: none;
-        }
+.map-container::-webkit-scrollbar {
+    display: none;
+}
 
-        /* Table Shapes */
-        .table-circle {
-            border-radius: 50%;
-            aspect-ratio: 1/1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
+/* Table Shapes */
+.table-circle {
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
 
-        .table-rect {
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
+.table-rect {
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
 
-        /* Animations */
-        @keyframes pulse-highlight {
-            0% {
-                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
-                transform: scale(1);
-            }
+/* Animations */
+@keyframes pulse-highlight {
+    0% {
+        box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
+        transform: scale(1);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(168, 85, 247, 0);
+        transform: scale(1.1);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+        transform: scale(1);
+    }
+}
 
-            70% {
-                box-shadow: 0 0 0 15px rgba(168, 85, 247, 0);
-                transform: scale(1.1);
-            }
+.highlighted {
+    background-color: #a855f7 !important; /* Purple-500 */
+    color: white !important;
+    border-color: #a855f7 !important;
+    animation: pulse-highlight 1.5s infinite;
+    z-index: 20;
+}
 
-            100% {
-                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
-                transform: scale(1);
-            }
-        }
+/* Floor Elements (Dark Theme) */
+.floor-area {
+    background-color: #3f3f46; /* Zinc-700 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d4d4d8; /* Zinc-200 */
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    border: none;
+}
 
-        .highlighted {
-            background-color: #a855f7 !important;
-            /* Purple-500 */
-            color: white !important;
-            border-color: #a855f7 !important;
-            animation: pulse-highlight 1.5s infinite;
-            z-index: 20;
-        }
+/* Grid Layout for the Map */
+.floor-grid {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    grid-template-rows: repeat(18, 1fr);
+    gap: 10px;
+    width: 900px;
+    height: 900px;
+    background-color: #18181b; /* Zinc-900 */
+    border: 2px solid #27272a; /* Zinc-800 */
+    padding: 20px;
+    position: relative;
+}
 
-        /* Floor Elements (Updated for Dark Theme) */
-        .floor-area {
-            background-color: #3f3f46;
-            /* Zinc-700 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #d4d4d8;
-            /* Zinc-200 */
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.75rem;
-            /* border: 2px solid #52525b; */
-            border: none;
-            /* Zinc-600 */
-        }
+/* Mobile Scale Wrapper */
+.scale-wrapper {
+    width: 100%;
+    overflow: auto;
+    position: relative;
+}
 
-        /* Grid Layout for the Map - Updated background for Dark Theme */
-        .floor-grid {
-            display: grid;
-            grid-template-columns: repeat(14, 1fr);
-            grid-template-rows: repeat(18, 1fr);
-            gap: 10px;
-            width: 900px;
-            height: 900px;
-            background-color: #18181b;
-            /* Zinc-900 */
-            border: 2px solid #27272a;
-            /* Zinc-800 */
-            padding: 20px;
-            position: relative;
-        }
+/* --- MOBILE-SPECIFIC LAYOUT AND SPACING (Max 768px) --- */
+@media (max-width: 768px) {
+    .floor-grid {
+        grid-template-rows: repeat(14, 1fr); /* Shrinks grid height */
+        max-height: 650px; /* Optional: cap background size */
+        overflow: hidden; /* Prevent stretch from internal content */
+    }
 
-        /* Mobile Scale Wrapper */
-        .scale-wrapper {
-            width: 100%;
-            overflow: auto;
-            position: relative;
-        }
 
-        /* --- MOBILE-SPECIFIC LAYOUT AND SIZING (Max 768px) --- */
-        @media (max-width: 768px) {
 
-            /* Add padding to the main map view container */
-            .mobile-padded-view {
-                padding: 1rem;
-                /* Added padding */
-            }
+    .floor-grid {
+        gap: 10px; /* Increased spacing between tables */
+        width: calc(100vw - 2rem - 8px);
+        height: auto;
+        min-width: 350px;
+        padding: 10px;
+    }
 
-            .floor-grid {
-                gap: 5px;
-                /* Reduce gap for closer tables and bigger appearance */
-                /* Use calc to adjust for the 1rem (16px) padding on the left and right */
-                width: calc(100vw - 2rem - 8px);
-                height: auto;
-                /* Let height adjust based on content */
-                min-width: 350px;
-                /* Ensure a minimum size */
-                padding: 10px;
-            }
+    .table-circle {
+        transform: scale(1.15); /* Larger circles */
+    }
 
-            .table-circle {
-                transform: scale(1.15);
-                /* Visually increase circle size by 15% */
-            }
+    .table-rect {
+        height: 80% !important;
+    }
 
-            .table-rect {
-                /* Ensure rectangular tables also look larger */
-                height: 80% !important;
-                /* Adjusted height due to tighter rows on mobile */
-            }
-        }
+    /* ✅ Add space below Buffet (static element #1) */
+    .floor-area:nth-child(1) {
+        margin-bottom: 12px;
+    }
+
+    /* ✅ Add spacing between the two entrances (static elements #5 and #6) */
+    .floor-area:nth-child(5),
+    .floor-area:nth-child(6) {
+        margin-left: 4px;
+        margin-right: 4px;
+    }
+}
+
     </style>
 </head>
 
@@ -237,7 +234,7 @@
             { id: 2, type: 'circle', pos: 'r1-c7', guests: ["Brown Deta", "Hackett Noel", "Hackett Oliven", "Henry Walcott", "Hibbert Melvina", "Lewis George", "Lynch Sofia", "Mcleod Eva", "Reid Dexter", "Reid Shirley"] },
 
             // Row 2 (Right)
-            { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Beckford Antonei", "Brown Charmaine", "Brown Errol", "Cole Avery", "Cole Brielle", "Cole Keaton", "Hackett Ann-Mari", "Hackett Radcliffe", "Hackett Vianne"] },
+            { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Beckford Antonette", "Brown Charmaine", "Brown Errol", "Cole Avery", "Cole Brielle", "Cole Keaton", "Hackett Ann-Mari", "Hackett Radcliffe", "Hackett Vianne"] },
 
             // Row 1 (Top Right)
             { id: 4, type: 'circle', pos: 'r1-c6', guests: ["Graham Diana", "Graham Paul", "Johnson Delroy", "Johnson June", "Reynolds Pauline", "Severin Barbara", "Williams Bill", "Williams Janet"] },
@@ -417,7 +414,7 @@
                 // Foyer — no background, no border ✔️
                 {
                     name: 'Foyer',
-                    style: `grid-area: 14 / 9 / 16 / 16;
+                    style: `grid-area: 11 / 9 / 16 / 16;
                 margin-bottom: 12px;
                 width: 80%;
                 justify-self: center;
@@ -451,17 +448,18 @@
                 // Entrances
                 {
                     name: 'Entrance',
-                    style: `grid-area: 17 / 2 / 18 / 9;
+                    style: `grid-area: 15 / 2 / 15 / 9;
                 background: #27272a;
                 color: white;
                 border: 1px solid white;`
                 },
                 {
                     name: 'Foyer Entrance',
-                    style: `grid-area: 17 / 9 / 18 / 15;
+                    style: `grid-area: 15 / 9 / 15 / 15;
                 background: #27272a;
                 color: white;
-                border: 1px solid white;`
+                border: 1px solid white;
+                text-align: center;`
                 },
             ];
 
