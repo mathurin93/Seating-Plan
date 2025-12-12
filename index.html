@@ -108,7 +108,7 @@
                 width: calc(100vw - 2rem - 8px);
                 min-width: 350px;
                 padding: 10px;
-                margin-bottom: 30px;
+                margin-bottom: 2px;
                 /* extra space for mobile footer */
             }
 
@@ -482,11 +482,8 @@
                 currentHighlightTimeout = null;
             }
 
+            // Switch view first
             switchView('map');
-
-            document.querySelectorAll('.highlighted').forEach(el => {
-                el.classList.remove('highlighted');
-            });
 
             requestAnimationFrame(() => {
                 const tableElement = document.querySelector(`[data-id="${tableId}"]`);
@@ -494,30 +491,46 @@
 
                 if (!tableElement || !tableData) return;
 
-                // 1. Scroll first
+                // Remove highlight only from this table (prevents animation conflicts)
+                tableElement.classList.remove('highlighted');
+
+                // 1. Scroll (Android: MUST happen before animation)
                 centerTableInView(tableElement);
 
-                // 2. Wait for scroll to finish (Android needs this)
+                // 2. Let scroll inertia finish
                 setTimeout(() => {
-                    // 3. Now add highlight
-                    tableElement.classList.add('highlighted');
 
-                    // 4. Full 3-second animation
-                    currentHighlightTimeout = setTimeout(() => {
-                        tableElement.classList.remove('highlighted');
+                    // 3. Fully reset the animation state
+                    tableElement.classList.remove('highlighted');
 
-                        // 5. Slight delay before opening modal (Android smoothness)
-                        setTimeout(() => {
-                            openModal(tableData);
-                            currentHighlightTimeout = null;
-                        }, 150);
+                    // 4. FORCE a true layout reflow (Android-safe)
+                    tableElement.getBoundingClientRect();
 
-                    }, 3000);
+                    // 5. Wait 2 frames for Android to paint the element
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
 
-                }, 350); // <-- This delay is the key for Android
+                            // 6. Apply animation class
+                            tableElement.classList.add('highlighted');
+
+                            // 7. After 3 seconds, remove the highlight
+                            currentHighlightTimeout = setTimeout(() => {
+                                tableElement.classList.remove('highlighted');
+
+                                // 8. Delay modal slightly for smoothness
+                                setTimeout(() => {
+                                    openModal(tableData);
+                                    currentHighlightTimeout = null;
+                                }, 150);
+
+                            }, 3000);
+
+                        });
+                    });
+
+                }, 350);
             });
         }
-
 
         function handleSearch(e) {
             const term = e.target.value.toLowerCase();
