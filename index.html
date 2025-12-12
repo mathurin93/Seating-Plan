@@ -6,136 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reception Seating Plan</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- <style>
-        html,
-        body {
-            overflow-x: hidden;
-        }
-
-        .map-container {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .map-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .table-circle,
-        .table-rect {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            will-change: transform, box-shadow;
-        }
-
-        .table-circle {
-            border-radius: 50%;
-            aspect-ratio: 1 / 1;
-        }
-
-        .table-rect {
-            border-radius: 8px;
-        }
-
-        @keyframes pulse-highlight {
-            0% {
-                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
-                transform: scale(1);
-            }
-
-            70% {
-                box-shadow: 0 0 0 15px rgba(168, 85, 247, 0);
-                transform: scale(1.1);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
-                transform: scale(1);
-            }
-        }
-
-        .highlighted {
-            background-color: #a855f7 !important;
-            color: white !important;
-            border-color: #a855f7 !important;
-            animation: pulse-highlight 1.5s ease-out 2;
-            z-index: 20;
-        }
-
-        .floor-area {
-            background-color: #3f3f46;
-            color: #d4d4d8;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.75rem;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .floor-grid {
-            display: grid;
-            grid-template-columns: repeat(16, 1fr);
-            grid-template-rows: repeat(18, 1fr);
-            gap: 10px;
-            width: 100%;
-            max-width: 900px;
-            height: 900px;
-            background-color: #18181b;
-            border: 2px solid #27272a;
-            padding: 20px;
-            position: relative;
-            margin-bottom: 20px;
-            /* space so footer doesn't cover bottom elements */
-        }
-
-        .scale-wrapper {
-            width: 100%;
-            overflow: auto;
-            position: relative;
-        }
-
-        @media (max-width: 768px) {
-            .floor-grid {
-                grid-template-rows: repeat(14, 1fr);
-                max-height: 650px;
-                overflow: hidden;
-                gap: 10px;
-                width: calc(100vw - 2rem - 8px);
-                min-width: 350px;
-                padding: 10px;
-                margin-bottom: 10px;
-                /* extra space for mobile footer */
-            }
-
-            .table-circle {
-                transform: scale(1.15);
-            }
-
-            .table-rect {
-                height: 80% !important;
-            }
-        }
-    </style> -->
     <style>
         html,
         body {
             overflow-x: hidden;
         }
-    
+
         .map-container {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-    
+
         .map-container::-webkit-scrollbar {
             display: none;
         }
-    
+
         .table-circle,
         .table-rect {
             display: flex;
@@ -144,35 +29,35 @@
             transition: all 0.3s ease;
             will-change: transform, opacity;
         }
-    
+
         .table-circle {
             border-radius: 50%;
             aspect-ratio: 1 / 1;
         }
-    
+
         .table-rect {
             border-radius: 8px;
         }
-    
+
         /* --------------------------------------------- */
         /* ANDROID-SAFE BLINKING ANIMATION (NO BOX-SHADOW) */
         /* --------------------------------------------- */
-    
+
         @keyframes blink-android-safe {
-    
+
             0%,
             55% {
                 opacity: 1;
                 transform: scale(1);
             }
-    
+
             56%,
             100% {
                 opacity: 0.35;
                 transform: scale(1.1);
             }
         }
-    
+
         .highlighted {
             background-color: #a855f7 !important;
             color: white !important;
@@ -180,11 +65,11 @@
             animation: blink-android-safe 0.7s ease-in-out infinite;
             z-index: 20;
         }
-    
+
         /* --------------------------------------------- */
         /* FLOOR PLAN STYLES (unchanged) */
         /* --------------------------------------------- */
-    
+
         .floor-area {
             background-color: #3f3f46;
             color: #d4d4d8;
@@ -197,7 +82,7 @@
             align-items: center;
             justify-content: center;
         }
-    
+
         .floor-grid {
             display: grid;
             grid-template-columns: repeat(16, 1fr);
@@ -212,13 +97,13 @@
             position: relative;
             margin-bottom: 20px;
         }
-    
+
         .scale-wrapper {
             width: 100%;
             overflow: auto;
             position: relative;
         }
-    
+
         @media (max-width: 768px) {
             .floor-grid {
                 grid-template-rows: repeat(14, 1fr);
@@ -230,11 +115,11 @@
                 padding: 10px;
                 margin-bottom: 10px;
             }
-    
+
             .table-circle {
                 transform: scale(1.15);
             }
-    
+
             .table-rect {
                 height: 80% !important;
             }
@@ -243,7 +128,7 @@
 
 </head>
 
-<body class="bg-black text-zinc-300 font-sans">
+<body class="bg-black text-zinc-300 font-sans min-h-screen flex flex-col">
 
     <header class="bg-zinc-900 shadow-lg z-30 flex-none border-b border-zinc-800">
         <div class="max-w-md mx-auto px-4 py-4">
@@ -264,9 +149,10 @@
         </div>
     </header>
 
-    <main class="relative overflow-hidden flex flex-col">
+    <main class="relative overflow-hidden flex flex-col flex-grow">
 
-        <div class="md:hidden flex justify-center py-2 space-x-4 bg-zinc-950 border-b border-zinc-800">
+        <!-- Mobile view switch buttons - Ensure this doesn't collapse the view below it -->
+        <div class="md:hidden flex justify-center py-2 space-x-4 bg-zinc-950 border-b border-zinc-800 flex-none">
             <button id="btnMap"
                 class="px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors">
                 Map View
@@ -277,14 +163,16 @@
             </button>
         </div>
 
-        <div class="relative overflow-hidden">
+        <!-- Main View Container: Must take up all remaining height of the main element -->
+        <div class="relative overflow-hidden flex-grow">
 
-        <div id="mapView" class="w-full overflow-auto  bg-zinc-950 flex justify-center p-0 md:p-4 map-container">
+            <div id="mapView" class="w-full overflow-auto  bg-zinc-950 flex justify-center p-0 md:p-4 map-container">
                 <div class="scale-wrapper flex justify-center">
                     <div id="floorPlan" class="floor-grid shadow-lg rounded-xl"></div>
                 </div>
             </div>
 
+            <!-- List View: Absolutely positioned to fill the height of its parent (which is now full-height) -->
             <div id="listView" class="absolute inset-0 bg-zinc-950 z-20 overflow-y-auto hidden p-4 pb-20">
                 <h2 class="text-lg font-bold mb-4 px-2 text-zinc-100">All Tables</h2>
                 <div id="listContainer" class="grid gap-3 grid-cols-1"></div>
@@ -323,7 +211,7 @@
         </div>
     </div>
 
-<footer class="w-full bg-zinc-900 border-t border-zinc-800 p-4 shadow-2xl mt-0">
+    <footer class="w-full bg-zinc-900 border-t border-zinc-800 p-4 shadow-2xl mt-0 flex-none">
 
         <a href="https://mathurin93.github.io/DB/" target="_self"
             class="w-full block text-center bg-purple-700 hover:bg-purple-600 transition-colors duration-200 text-zinc-200 font-semibold py-3 rounded-xl shadow-lg md:max-w-xs md:mx-auto">
@@ -336,30 +224,30 @@
         const tablesData = [
             { id: 'HT', label: 'Head Table', type: 'rect', pos: 'stage', guests: ["Brown David", "Brown Melleta"] },
 
-            { id: 1, type: 'rect', pos: 'r2-c7', guests: ["Brown Claud", "Edwards Gervan", "Edwards Marlene", "Ford Claudeth", "Linton Josephine", "Linton-Brown Jea", "Saunders Cynthia", "Broomes Janan", "Roban Victor"] },
+            { id: 1, type: 'rect', pos: 'r2-c7', guests: ["Brown Claud", "Edwards Gervan", "Edwards Marlene", "Ford Claudeth", "Linton Josephine", "Linton-Brown Jean", "Saunders Cynthia"]},
             { id: 2, type: 'circle', pos: 'r1-c7', guests: ["Brown Deta", "Hackett Noel", "Hackett Oliven", "Henry Walcott", "Hibbert Melvina", "Lewis George", "Lynch Sofia", "Mcleod Eva", "Reid Dexter", "Reid Shirley"] },
-            { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Beckford Antonette", "Brown Charmaine", "Brown Errol", "Cole Avery", "Cole Brielle", "Cole Keaton", "Hackett Ann-Mari", "Hackett Radcliffe", "Hackett Vianne"] },
-            { id: 4, type: 'circle', pos: 'r1-c6', guests: ["Graham Diana", "Graham Paul", "Johnson Delroy", "Johnson June", "Reynolds Pauline", "Severin Barbara", "Williams Bill", "Williams Janet"] },
-            { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Treleven Marva", "Wisdom Sandra"] },
-            { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blackstock Denton", "Blackstock Venise", "Bryan Leonard", "Bryan Petronah", "Cousins Christine", "Cousins Marcel", "Guthrie Barbara", "Maxwell Kenneth", "McLaughlin Ivy", "McLaughlin Sonia"] },
+            { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Broomes Juann","Brown Charmaine", "Brown Errol", "Hackett Ann-Marie", "Hackette Daunte","Hackett Radcliffe", "Roban Victor","Hackett Vianne"] },
+            { id: 4, type: 'circle', pos: 'r1-c6', guests: ["Graham Diana", "Graham Paul", "Johnson Delroy", "Johnson June", "Reynolds Pauline", "Reynolds Roberts", "Severin Barbara", "Williams Bill", "Williams Janet"] },
+            { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Treleven Marva", "Edwards Marvel","Wisdom Sandra"] },
+            { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blagrove Carol", "Blagrove Maurice", "Byfield Althea", "Byfield Devon", "Green Dawn", "Green Howard", "Mitchell Dion", "Mitchell Kedisha", "Rose Althea", "Rose Denrick"] },
             { id: 7, type: 'circle', pos: 'r2-c3', guests: ["Baptiste Delores", "Coppin Chileta", "Goodridge Angela", "Jackson Marcia", "Levy Ann Marie", "Levy Loyton", "Lewis Edward", "Mckoy Paulette", "Pitters Yvette", "Rattray Valerie"] },
             { id: 8, type: 'circle', pos: 'r1-c3', guests: ["Blair Dwayne", "Blair Patricia", "Butler Leroy", "Butler Wendy", "Douglas Gary", "Douglas Priscilla", "Ricketts Chase", "Ricketts Melonie", "Rose Andrew", "Rose Brenda"] },
-            { id: 9, type: 'circle', pos: 'r2-c2', guests: ["Anderson Nicole", "Anderson Ralston", "Griffith Ann-Mari", "Griffith Marlon", "Hunte Leroy", "Hunte Maureen", "Smith Alicia", "Smith Gary", "Spence Ezekiel", "Spence Lincoln"] },
-            { id: 10, type: 'circle', pos: 'r1-c2', guests: ["Clemeston Doree", "Clemeston Miche", "Comrie Clive", "Duncan Clarence", "Duncan Lydia", "James Loralee", "Lorray Elizabeth", "Smith Desline", "Walsh Clifford"] },
-            { id: 11, type: 'circle', pos: 'r2-c1', guests: ["Barrett Kingsley", "Barrett Lillian", "Dawns Dawn", "Ford Donna", "Lambert Sheril", "Marcia Clarke", "Peart Angie", "Peart Percy", "Williams Pauline", "Graham David"] },
+            { id: 9, type: 'circle', pos: 'r2-c2', guests: ["Anderson Nicole", "Anderson Ralston", "Griffith Ann-Marie", "Griffith Marlon", "Hunte Leroy", "Hunte Maureen", "Smith Alicia", "Smith Gary", "Spence Ezekiel", "Spence Lincoln"] },
+            { id: 10, type: 'circle', pos: 'r1-c2', guests: ["Clemeston Doreen", "Clemeston Michelle", "Comrie Clive", "Duncan Clarence", "Duncan Lydia", "James Loralee", "Lorray Elizabeth", "Smith Desline", "Walsh Clifford"] },
+            { id: 11, type: 'circle', pos: 'r2-c1', guests: ["Barrett Kingsley", "Barrett Lillian", "Dawns Dawn", "Ford Donna", "Lambert Sherril", "Marcia Clarke", "Peart Angie", "Peart Percy", "Williams Pauline", "Graham David"] },
             { id: 12, type: 'circle', pos: 'r1-c1', guests: ["Clemeston Kristine", "Clemeston Nazheme", "Gordon Janet", "Gordon Leroy", "Johnson Cara", "Longmore Daniel", "Lorray Sarah", "Williams Emma", "Peart Marc"] },
-            { id: 13, type: 'rect', pos: 'r3-c7', guests: ["Brown Laurie Ann", "Brown Vanessa", "Foster Odette", "James Aria", "James Desmond", "James Jayna", "James Natasha", "Sargeant Omari", "Sargeant Deborah"] },
+            { id: 13, type: 'rect', pos: 'r3-c7', guests: ["Brown Laurie Ann", "Brown Vanessa", "Hibbert  Mark","Hibbert Maquieta", "James Aria", "James Desmond", "James Jayna", "James Natasha", "Sargeant Omari", "Sargeant Deborah"] },
             { id: 14, type: 'circle', pos: 'r4-c7', guests: ["Davis Cherell", "Davis Robert", "Foster Goldwyn", "Foster Jason", "Foster Shimyka", "Hibbert John Jr.", "Maxwell Noreen", "Newell Simone", "Reid Judeth"] },
             { id: 15, type: 'circle', pos: 'r3-c6', guests: ["Foster Justin", "Fraser Jalesa", "Fraser Jason", "Gordon Brandi", "Hackett Felicia", "Manhertz Brittney", "Manhertz Michael", "Robinson Bethany", "Robinson Mathurin", "Wisdom Corey"] },
             { id: 16, type: 'circle', pos: 'r4-c6', guests: ["Anderson Brittanya", "Anderson Keana", "Lynch Josiah", "Lynch Samantha", "Mushett Andrew", "Foster Jaida", "James Darius", "Lake Toriyah", "Wesley Jada"] },
-            { id: 17, type: 'circle', pos: 'r3-c4', guests: ["Blagrove Carol", "Blagrove Maurice", "Byfield Althea", "Byfield Devon", "Green Dawn", "Green Howard", "Mitchell Dion", "Mitchell Kedisha", "Rose Althea", "Rose Denrick"] },
+            { id: 17, type: 'circle', pos: 'r3-c4', guests: ["Blackstock Denton", "Blackstock Venise", "Bryan Leonard", "Bryan Petronah", "Cousins Christine", "Cousins Marcel", "Guthrie Barbara", "Maxwell Kenneth", "McLaughlin Ivy", "McLaughlin Sonia"] },
             { id: 18, type: 'circle', pos: 'r4-c4', guests: ["Antonette Scott", "Dalton Scott", "Dixon Donovan", "Kelly Ian", "Kelly Nicole", "Lee Peter", "Soprano Scott", "Thompson Charmaine", "Wallace Shawn", "Young-Dixon Sanja"] },
-            { id: 19, type: 'circle', pos: 'r3-c3', guests: ["Bennett Ricardo", "Cubitt Mark", "Cubitt Michelle", "Hall Kerryann", "Hall Michael", "Halstead Kirk", "Halstead Nadine", "St. Louis Anthony", "St. Louis Michelle", "Wallace-Bennett L"] },
-            { id: 20, type: 'circle', pos: 'r4-c3', guests: ["Anderson Tanesha", "Bell Angélique", "Comrie Allison", "Comrie Sherry", "Duff Christopher", "Graham Latoya", "Graham Latoya", "Lake Nathania", "Treleven Susie"] },
-            { id: 21, type: 'circle', pos: 'r3-c2', guests: ["Ann Marie Thom", "Edwards-Ledger", "George Tashieka", "Jameson Verness", "Ledger Jeffrey", "McKoy Audley", "McKoy Geisell", "McKoy Ramona", "Rodney Roxan", "Winsome Wesley"] },
-            { id: 22, type: 'circle', pos: 'r4-c2', guests: ["Clarke Ronjay", "Clarke Sashane", "Gordon Shari", "Jameson Verness", "Lynch Marseenia", "Olivierre Kelton", "Olivierre Sigri", "Solomon Caitlyn", "Solomon Shanne"] },
-            { id: 23, type: 'circle', pos: 'r3-c1', guests: ["Byfield Nathaniel", "Byfield Rennae", "Chambers Matti", "Hibbert Maquetia", "Hibbert Mark", "Nichols Joanna", "Nichols O'Brian", "Rose Ricardo", "Severin David"] },
-            { id: 24, type: 'circle', pos: 'r4-c1', guests: ["Clarke Adriel", "Clarke Yashime", "Douglas Diondra", "Douglas Diandra", "Hibbert Maquetia", "Kayla McLean", "Lake Yosephine", "Cousins Christopher", "Cousins Lydia", "Cousins Samantha", "Phillip McLean"] }
+            { id: 19, type: 'circle', pos: 'r3-c3', guests: ["Bennett Ricardo", "Cubitt Mark", "Cubitt Michelle", "Hall Kerryann", "Hall Michael", "Halstead Kirk", "Halstead Nadine", "St. Louis Anthony", "St. Louis Michelle", "Wallace-Bennett Lisa"] },
+            { id: 20, type: 'circle', pos: 'r4-c3', guests: ["Anderson Tanesha", "Bell Angélique", "Comrie Allison", "Comrie Sherry", "Duff Christopher", "Duff Stephaine", "Graham Latoya", "Lake Nathania", "Treleven Susie"] },
+            { id: 21, type: 'circle', pos: 'r3-c2', guests: ["Ann Marie Thompson", "Edwards-Ledger Athene", "George Tashieka", "Jameson Vernessa", "Ledger Jeffrey", "McKoy Audley", "McKoy Geisell", "McKoy Ramona", "Rodney Roxan", "Winsome Wesley"] },
+            { id: 22, type: 'circle', pos: 'r4-c2', guests: ["Clarke Ronjay", "Clarke Sashane", "Gordon Shari", "Laws Jonathan", "Lynch Marseeniah", "Olivierre Kelton", "Olivierre Sigrid", "Solomon Caitlyn", "Solomon Shannel"] },
+            { id: 23, type: 'circle', pos: 'r3-c1', guests: ["Byfield Nathaniel", "Byfield Rennae", "Chambers Mattrill", "Beckford Antonette", "Cole Keaton", "Nichols Joanna", "Nichols O'Brian", "Rose Ricardo", "Rose Alicia", "Severin David"] },
+            { id: 24, type: 'circle', pos: 'r4-c1', guests: ["Clarke Adriel", "Clarke Yahsmine", "Douglas Diondra", "Guthrie Aliyah", "Kayla McLean", "Lake Yosephine", "Cousins Christopher", "Cousins Lydia", "Cousins Samantha", "Phillip McLean"] }
         ];
 
         // --- DOM references ---
@@ -597,50 +485,50 @@
         }
 
         function highlightTable(tableId) {
-                if (currentHighlightTimeout) {
-                    clearTimeout(currentHighlightTimeout);
-                    currentHighlightTimeout = null;
-                }
+            if (currentHighlightTimeout) {
+                clearTimeout(currentHighlightTimeout);
+                currentHighlightTimeout = null;
+            }
 
-                switchView('map');
+            switchView('map');
 
-                document.querySelectorAll('.highlighted').forEach(el => {
-                    el.classList.remove('highlighted');
-                });
+            document.querySelectorAll('.highlighted').forEach(el => {
+                el.classList.remove('highlighted');
+            });
 
+            requestAnimationFrame(() => {
+                const tableElement = document.querySelector(`[data-id="${tableId}"]`);
+                const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
+
+                if (!tableElement || !tableData) return;
+
+                // FRAME 1 → scroll only
+                centerTableInView(tableElement);
+
+                // allow scroll motion to settle BEFORE animation
                 requestAnimationFrame(() => {
-                    const tableElement = document.querySelector(`[data-id="${tableId}"]`);
-                    const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
-
-                    if (!tableElement || !tableData) return;
-
-                    // FRAME 1 → scroll only
-                    centerTableInView(tableElement);
-
-                    // allow scroll motion to settle BEFORE animation
                     requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
 
-                            // reset state
+                        // reset state
+                        tableElement.classList.remove('highlighted');
+                        void tableElement.offsetWidth; // force reflow
+
+                        // FRAME 4 → start blinking animation
+                        tableElement.classList.add('highlighted');
+
+                        currentHighlightTimeout = setTimeout(() => {
                             tableElement.classList.remove('highlighted');
-                            void tableElement.offsetWidth; // force reflow
 
-                            // FRAME 4 → start blinking animation
-                            tableElement.classList.add('highlighted');
+                            setTimeout(() => {
+                                openModal(tableData);
+                                currentHighlightTimeout = null;
+                            }, 150);
 
-                            currentHighlightTimeout = setTimeout(() => {
-                                tableElement.classList.remove('highlighted');
-
-                                setTimeout(() => {
-                                    openModal(tableData);
-                                    currentHighlightTimeout = null;
-                                }, 150);
-
-                            }, 3000); // <-- animation runs full 3 seconds on Samsung
-                        });
+                        }, 3000); // <-- animation runs full 3 seconds on Samsung
                     });
                 });
-            }
+            });
+        }
 
 
         function handleSearch(e) {
