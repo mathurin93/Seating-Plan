@@ -108,7 +108,7 @@
                 width: calc(100vw - 2rem - 8px);
                 min-width: 350px;
                 padding: 10px;
-                margin-bottom: 2px;
+                margin-bottom: 10px;
                 /* extra space for mobile footer */
             }
 
@@ -298,8 +298,8 @@
                     { name: 'Foyer', style: `grid-area: 11 / 9 / 16 / 16; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
                     { name: 'Bar', style: `grid-area: 12 / 4 / 13 / 9; margin-bottom: 8px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
                     { name: 'Reception', style: `grid-area: 13 / 4 / 14 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
-                    { name: 'Entrance', style: `grid-area: 15 / 2 / 16 / 9; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
-                    { name: 'Foyer Entrance', style: `grid-area: 15 / 9 / 16 / 15; background: #27272a; color: white; border: 1px solid ${PURPLE_400}; text-align: center;` },
+                    { name: 'Entrance', style: `grid-area: 15 / 1 / 16 / 8; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
+                    { name: 'Foyer Entrance', style: `grid-area: 15 / 11 / 16 / 18; background: #27272a; color: white; border: 1px solid ${PURPLE_400}; text-align: center;` },
                 ];
             } else {
                 config.posMap = posMapDesktop;
@@ -381,14 +381,14 @@
                     card.className =
                         'bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:bg-zinc-800 transition-colors cursor-pointer';
                     card.innerHTML = `
-          <div class="flex justify-between items-center mb-2">
-            <span class="font-bold text-lg text-amber-400">${table.label || 'Table ' + table.id
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-bold text-lg text-amber-400">${table.label || 'Table ' + table.id
                         }</span>
-            <span class="text-xs text-zinc-400 bg-zinc-800 px-2 py-1 rounded-full">${table.guests.length
+                <span class="text-xs text-zinc-400 bg-zinc-800 px-2 py-1 rounded-full">${table.guests.length
                         } Guests</span>
-          </div>
-          <p class="text-sm text-zinc-400 truncate">${table.guests.join(', ')}</p>
-        `;
+              </div>
+              <p class="text-sm text-zinc-400 truncate">${table.guests.join(', ')}</p>
+            `;
                     card.addEventListener('click', () => openModal(table));
                     container.appendChild(card);
                 });
@@ -405,11 +405,11 @@
                 li.className =
                     'flex items-center space-x-3 py-2 border-b border-zinc-800 last:border-0';
                 li.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-amber-900/40 flex items-center justify-center text-amber-400 font-bold text-xs">
-          ${guest.charAt(0)}
-        </div>
-        <span class="text-zinc-200 font-medium">${guest}</span>
-      `;
+            <div class="w-8 h-8 rounded-full bg-amber-900/40 flex items-center justify-center text-amber-400 font-bold text-xs">
+              ${guest.charAt(0)}
+            </div>
+            <span class="text-zinc-200 font-medium">${guest}</span>
+          `;
                 list.appendChild(li);
             });
 
@@ -476,61 +476,52 @@
             });
         }
 
-       function highlightTable(tableId) {
-            if (currentHighlightTimeout) {
-                clearTimeout(currentHighlightTimeout);
-                currentHighlightTimeout = null;
-            }
+        function highlightTable(tableId) {
+                if (currentHighlightTimeout) {
+                    clearTimeout(currentHighlightTimeout);
+                    currentHighlightTimeout = null;
+                }
 
-            // Switch view first
-            switchView('map');
+                switchView('map');
 
-            requestAnimationFrame(() => {
-                const tableElement = document.querySelector(`[data-id="${tableId}"]`);
-                const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
+                document.querySelectorAll('.highlighted').forEach(el => {
+                    el.classList.remove('highlighted');
+                });
 
-                if (!tableElement || !tableData) return;
+                requestAnimationFrame(() => {
+                    const tableElement = document.querySelector(`[data-id="${tableId}"]`);
+                    const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
 
-                // Remove highlight only from this table (prevents animation conflicts)
-                tableElement.classList.remove('highlighted');
+                    if (!tableElement || !tableData) return;
 
-                // 1. Scroll (Android: MUST happen before animation)
-                centerTableInView(tableElement);
+                    // FRAME 1 → scroll only
+                    centerTableInView(tableElement);
 
-                // 2. Let scroll inertia finish
-                setTimeout(() => {
-
-                    // 3. Fully reset the animation state
-                    tableElement.classList.remove('highlighted');
-
-                    // 4. FORCE a true layout reflow (Android-safe)
-                    tableElement.getBoundingClientRect();
-
-                    // 5. Wait 2 frames for Android to paint the element
+                    // allow scroll motion to settle BEFORE animation
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => {
 
-                            // 6. Apply animation class
+                            // reset state
+                            tableElement.classList.remove('highlighted');
+                            void tableElement.offsetWidth; // force reflow
+
+                            // FRAME 4 → start blinking animation
                             tableElement.classList.add('highlighted');
 
-                            // 7. After 3 seconds, remove the highlight
                             currentHighlightTimeout = setTimeout(() => {
                                 tableElement.classList.remove('highlighted');
 
-                                // 8. Delay modal slightly for smoothness
                                 setTimeout(() => {
                                     openModal(tableData);
                                     currentHighlightTimeout = null;
                                 }, 150);
 
-                            }, 3000);
-
+                            }, 3000); // <-- animation runs full 3 seconds on Samsung
                         });
                     });
+                });
+            }
 
-                }, 350);
-            });
-        }
 
         function handleSearch(e) {
             const term = e.target.value.toLowerCase();
@@ -557,10 +548,10 @@
                     div.className =
                         'px-4 py-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-900 last:border-0';
                     div.innerHTML = `
-          <div class="font-medium text-zinc-100">${res.guest}</div>
-          <div class="text-xs text-amber-400 font-bold">${res.table.label || 'Table ' + res.table.id
+              <div class="font-medium text-zinc-100">${res.guest}</div>
+              <div class="text-xs text-amber-400 font-bold">${res.table.label || 'Table ' + res.table.id
                         }</div>
-        `;
+            `;
                     div.addEventListener('click', () => {
                         highlightTable(res.table.id);
                         searchResults.classList.add('hidden');
