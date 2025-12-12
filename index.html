@@ -752,28 +752,34 @@
             function highlightTable(tableId) {
                     switchView('map');
 
-                    document.querySelectorAll('.highlighted')
-                        .forEach(el => el.classList.remove('highlighted'));
-
-                    const el = document.querySelector(`div[data-id="${tableId}"]`);
-                    if (!el) return;
-
-                    const table = tablesData.find(t => t.id == tableId);
-
-                    // Smooth scroll first
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-
-                    // ✅ Delay highlight for Android
+                    // Wait for map to render
                     setTimeout(() => {
-                        el.classList.add('highlighted');
+                        document.querySelectorAll('.highlighted')
+                            .forEach(el => el.classList.remove('highlighted'));
 
-                        // Remove highlight + open modal
+                        const el = document.querySelector(`div[data-id="${tableId}"]`);
+                        if (!el) return;
+
+                        const table = tablesData.find(t => t.id == tableId);
+
+                        // Scroll first
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+                        // ✅ Android-safe highlight: wait for scroll + layout + paint
                         setTimeout(() => {
-                            el.classList.remove('highlighted');
-                            if (table) openModal(table);
-                        }, 1500);
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    el.classList.add('highlighted');
 
-                    }, 300);
+                                    setTimeout(() => {
+                                        el.classList.remove('highlighted');
+                                        if (table) openModal(table);
+                                    }, 1500);
+                                });
+                            });
+                        }, 200);
+
+                    }, 50);
                 }
 
 
