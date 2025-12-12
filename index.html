@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reception Seating Plan</title>
+    <!-- Using Tailwind CSS for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom Scrollbar for the map container */
@@ -43,6 +44,8 @@
 
         /* Animations */
         @keyframes pulse-highlight {
+
+            /* Keeping the highlight pulse purple as the primary interaction color */
             0% {
                 box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
                 transform: scale(1);
@@ -160,7 +163,8 @@
     </style>
 </head>
 
-<body class="bg-black text-zinc-300 h-screen flex flex-col font-sans">
+<body class="bg-black text-zinc-300 h-screen flex flex-col font-sans pb-20">
+    <!-- Added pb-20 to body to account for fixed footer -->
 
     <header class="bg-zinc-900 shadow-lg z-30 flex-none border-b border-zinc-800">
         <div class="max-w-md mx-auto px-4 py-4">
@@ -168,7 +172,7 @@
 
             <div class="relative">
                 <input type="text" id="searchInput" placeholder="Search for a guest..."
-                    class="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm shadow-sm transition-all">
+                    class="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent text-sm shadow-sm transition-all">
                 <svg class="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -222,7 +226,8 @@
                 class="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-purple-900/20 rounded-t-2xl">
                 <div>
                     <h3 class="text-xl font-bold text-zinc-100" id="modalTitle">Table 1</h3>
-                    <p class="text-xs text-purple-400 font-medium uppercase tracking-wider mt-0.5">Guest List</p>
+                    <!-- Changed secondary text to gold -->
+                    <p class="text-xs text-amber-400 font-medium uppercase tracking-wider mt-0.5">Guest List</p>
                 </div>
                 <button id="closeModal"
                     class="p-2 bg-zinc-800 rounded-full text-zinc-400 hover:text-zinc-200 shadow-sm hover:shadow transition-all">
@@ -243,6 +248,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating Footer Button for Navigation -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 p-4 z-40 shadow-2xl">
+        <!-- ADDED target="_self" to ensure navigation happens in the current tab/window -->
+        <a href="https://mathurin93.github.io/DB/" target="_self"
+            class="w-full block text-center bg-purple-700 hover:bg-purple-600 transition-colors duration-200 text-zinc-200 font-semibold py-3 rounded-xl shadow-lg md:max-w-xs md:mx-auto">
+            &larr; Go Back to Main Site
+        </a>
+    </footer>
 
     <script>
         // --- Data: Tables & Guests ---
@@ -336,8 +350,6 @@
 
         // Global variable to track the current highlight/modal timeout
         let currentHighlightTimeout = null;
-
-
         // CSS Grid mapping matching the image logic (DEFAULT/DESKTOP)
         const posMapDesktop = {
             'r1-c1': 'grid-area: 2 / 2 / 4 / 4;', 'r1-c2': 'grid-area: 2 / 4 / 4 / 6;', 'r1-c3': 'grid-area: 2 / 6 / 4 / 8;', 'r1-c4': 'grid-area: 2 / 8 / 4 / 10;',
@@ -360,9 +372,6 @@
             'r4-c1': 'grid-area: 10 / 2 / 12 / 4;', 'r4-c2': 'grid-area: 10 / 4 / 12 / 6;', 'r4-c3': 'grid-area: 10 / 6 / 12 / 8;', 'r4-c4': 'grid-area: 10 / 8 / 12 / 10;',
             'r4-c6': 'grid-area: 10 / 11 / 12 / 13;', 'r4-c7': 'grid-area: 10 / 13 / 12 / 15;',
         };
-
-
-        // --- Functions ---
         function getLayoutConfig() {
             const isMobile = window.innerWidth <= 768;
             let config = {};
@@ -372,6 +381,8 @@
             const ZINC_600 = '#52525b';
             const ZINC_200 = '#d4d4d8';
             const ZINC_400 = '#a1a1aa';
+            // Purple for Entrance borders (Purple-400)
+            const PURPLE_400 = '#c084fc';
 
             if (isMobile) {
                 // Mobile Configuration
@@ -383,8 +394,9 @@
                     { name: 'Foyer', style: `grid-area: 11 / 9 / 16 / 16; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
                     { name: 'Bar', style: `grid-area: 12 / 4 / 13 / 9; margin-bottom: 8px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
                     { name: 'Reception', style: `grid-area: 13 / 4 / 14 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
-                    { name: 'Entrance', style: `grid-area: 15 / 2 / 15 / 9; background: #27272a; color: white; border: 1px solid white;` },
-                    { name: 'Foyer Entrance', style: `grid-area: 15 / 9 / 15 / 15; background: #27272a; color: white; border: 1px solid white; text-align: center;` },
+                    // Entrance borders changed from white to PURPLE_400
+                    { name: 'Entrance', style: `grid-area: 15 / 2 / 15 / 9; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
+                    { name: 'Foyer Entrance', style: `grid-area: 15 / 9 / 15 / 15; background: #27272a; color: white; border: 1px solid ${PURPLE_400}; text-align: center;` },
                 ];
 
             } else {
@@ -397,15 +409,14 @@
                     { name: 'Bar', style: `grid-area: 15 / 4 / 16 / 9; margin-top: 10px; margin-bottom: 10px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
                     { name: 'Reception', style: `grid-area: 16 / 4 / 17 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
                     { name: 'Foyer', style: `grid-area: 15 / 9 / 16 / 16; margin-top: 8px; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
-                    { name: 'Entrance', style: `grid-area: 17 / 2 / 18 / 9; background: #27272a; color: white; border: 1px solid white;` },
-                    { name: 'Foyer Entrance', style: `grid-area: 17 / 9 / 18 / 15; background: #27272a; color: white; border: 1px solid white;` },
+                    // Entrance borders changed from white to PURPLE_400
+                    { name: 'Entrance', style: `grid-area: 17 / 2 / 18 / 9; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
+                    { name: 'Foyer Entrance', style: `grid-area: 17 / 9 / 18 / 15; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
                 ];
             }
 
             return config;
         }
-
-
         function renderMap() {
             floorPlan.innerHTML = '';
             const { posMap, staticElements, htStyle } = getLayoutConfig();
@@ -425,10 +436,11 @@
                 el.dataset.id = table.id;
                 el.addEventListener('click', () => openModal(table));
 
-                // Special handling for Head Table
+                // Special handling for Head Table (using purple background with gold border/text)
                 if (table.id === 'HT') {
                     el.style.cssText += htStyle;
-                    el.className = 'table-rect bg-purple-700 border-2 border-purple-500 text-white font-bold text-base shadow-lg cursor-pointer hover:border-white hover:bg-purple-600';
+                    // Updated Head Table styles for gold accents
+                    el.className = 'table-rect bg-purple-800 border-2 border-amber-400 text-amber-400 font-bold text-base shadow-lg cursor-pointer hover:border-amber-300 hover:bg-purple-700';
                     el.style.width = '100%';
                     el.style.height = '100%';
                     el.innerText = table.label;
@@ -436,11 +448,11 @@
                     return;
                 }
 
-                // Regular tables (circle or rect)
+                // Regular tables (circle or rect) - using gold text for table ID
                 if (table.type === 'circle') {
-                    el.className = 'table-circle bg-zinc-800 border-2 border-zinc-700 text-purple-400 font-bold text-lg shadow-md cursor-pointer hover:border-purple-500 hover:text-purple-300';
+                    el.className = 'table-circle bg-zinc-800 border-2 border-zinc-700 text-amber-400 font-bold text-lg shadow-md cursor-pointer hover:border-amber-500 hover:text-amber-300';
                 } else {
-                    el.className = 'table-rect bg-zinc-800 border-2 border-zinc-700 text-purple-400 font-bold text-lg shadow-md cursor-pointer hover:border-purple-500 hover:text-purple-300';
+                    el.className = 'table-rect bg-zinc-800 border-2 border-zinc-700 text-amber-400 font-bold text-lg shadow-md cursor-pointer hover:border-amber-500 hover:text-amber-300';
                     el.style.width = '100%';
                     if (window.innerWidth > 768) {
                         el.style.height = '60%';
@@ -471,7 +483,8 @@
                     card.className = 'bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:bg-zinc-800 transition-colors cursor-pointer';
                     card.innerHTML = `
                 <div class="flex justify-between items-center mb-2">
-                    <span class="font-bold text-lg text-purple-400">${table.label || 'Table ' + table.id}</span>
+                    <!-- Changed list table title text to gold -->
+                    <span class="font-bold text-lg text-amber-400">${table.label || 'Table ' + table.id}</span>
                     <span class="text-xs text-zinc-400 bg-zinc-800 px-2 py-1 rounded-full">${table.guests.length} Guests</span>
                 </div>
                 <p class="text-sm text-zinc-400 truncate">${table.guests.join(', ')}</p>
@@ -490,7 +503,8 @@
                 const li = document.createElement('li');
                 li.className = 'flex items-center space-x-3 py-2 border-b border-zinc-800 last:border-0';
                 li.innerHTML = `
-            <div class="w-8 h-8 rounded-full bg-purple-900/40 flex items-center justify-center text-purple-400 font-bold text-xs">
+            <!-- Changed guest initial icon background and text to gold -->
+            <div class="w-8 h-8 rounded-full bg-amber-900/40 flex items-center justify-center text-amber-400 font-bold text-xs">
                 ${guest.charAt(0)}
             </div>
             <span class="text-zinc-200 font-medium">${guest}</span>
@@ -528,7 +542,6 @@
             }
             renderMap();
         }
-
         /**
          * Finds and highlights a table on the map view, ensuring it's visible.
          * @param {string|number} tableId The ID of the table to highlight.
@@ -576,8 +589,6 @@
                 }, 3000);
             }
         }
-
-
         function handleSearch(e) {
             const term = e.target.value.toLowerCase();
             searchResults.innerHTML = '';
@@ -603,7 +614,8 @@
                     div.className = 'px-4 py-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-900 last:border-0';
                     div.innerHTML = `
                 <div class="font-medium text-zinc-100">${res.guest}</div>
-                <div class="text-xs text-purple-400 font-bold">${res.table.label || 'Table ' + res.table.id}</div>
+                <!-- Changed search result table label to gold -->
+                <div class="text-xs text-amber-400 font-bold">${res.table.label || 'Table ' + res.table.id}</div>
             `;
                     div.addEventListener('click', () => {
                         // This triggers the highlight and sets the 3-second delay for the modal
@@ -624,18 +636,20 @@
 
         // --- Initialization and Event Listeners ---
         document.getElementById('closeModal').addEventListener('click', closeModalFn);
+        // Added modal overlay click to close functionality
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay) closeModalFn();
         });
         searchInput.addEventListener('input', handleSearch);
         btnMap.addEventListener('click', () => switchView('map'));
         btnList.addEventListener('click', () => switchView('list'));
+
         window.addEventListener('resize', renderMap);
 
-        // Initial setup
+        // Init
         renderMap();
         renderListView();
-        switchView('map');
+
 
     </script>
 </body>
