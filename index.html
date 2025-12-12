@@ -2,50 +2,44 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reception Seating Plan</title>
-    <!-- Using Tailwind CSS for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom Scrollbar for the map container */
+        html,
+        body {
+            overflow-x: hidden;
+        }
+
         .map-container {
             -ms-overflow-style: none;
-            /* IE and Edge */
             scrollbar-width: none;
-            /* Firefox */
         }
 
         .map-container::-webkit-scrollbar {
             display: none;
         }
 
-        /* Table Shapes */
-        .table-circle {
-            border-radius: 50%;
-            aspect-ratio: 1/1;
+        .table-circle,
+        .table-rect {
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            /* FIX: Hint browser to keep hardware acceleration active during scroll */
             will-change: transform, box-shadow;
+        }
+
+        .table-circle {
+            border-radius: 50%;
+            aspect-ratio: 1 / 1;
         }
 
         .table-rect {
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            /* FIX: Hint browser to keep hardware acceleration active during scroll */
-            will-change: transform, box-shadow;
         }
 
-        /* Animations */
         @keyframes pulse-highlight {
-
-            /* Keeping the highlight pulse purple as the primary interaction color */
             0% {
                 box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
                 transform: scale(1);
@@ -64,82 +58,60 @@
 
         .highlighted {
             background-color: #a855f7 !important;
-            /* Purple-500 */
             color: white !important;
             border-color: #a855f7 !important;
-            /* Animation set to run twice (2 repetitions) */
             animation: pulse-highlight 1.5s ease-out 2;
             z-index: 20;
-            /* FIX: Ensure highlight is hardware accelerated */
-            will-change: transform, box-shadow;
         }
 
-        /* Floor Elements (Dark Theme) */
         .floor-area {
             background-color: #3f3f46;
-            /* Zinc-700 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: #d4d4d8;
-            /* Zinc-200 */
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             font-size: 0.75rem;
             border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Grid Layout for the Map */
         .floor-grid {
             display: grid;
-            grid-template-columns: repeat(14, 1fr);
+            grid-template-columns: repeat(16, 1fr);
             grid-template-rows: repeat(18, 1fr);
             gap: 10px;
-            width: 900px;
+            width: 100%;
+            max-width: 900px;
             height: 900px;
             background-color: #18181b;
-            /* Zinc-900 */
             border: 2px solid #27272a;
-            /* Zinc-800 */
             padding: 20px;
             position: relative;
+            margin-bottom: 90px;
+            /* space so footer doesn't cover bottom elements */
         }
 
-        /* Mobile Scale Wrapper */
         .scale-wrapper {
             width: 100%;
             overflow: auto;
             position: relative;
         }
 
-        /* --- MOBILE-SPECIFIC LAYOUT AND SPACING (Max 768px) --- */
         @media (max-width: 768px) {
-
             .floor-grid {
                 grid-template-rows: repeat(14, 1fr);
-                /* Tightened background */
                 max-height: 650px;
-                /* Prevent long background */
                 overflow: hidden;
-                /* Prevent stretch */
                 gap: 10px;
                 width: calc(100vw - 2rem - 8px);
-                height: auto;
                 min-width: 350px;
                 padding: 10px;
+                margin-bottom: 110px;
+                /* extra space for mobile footer */
             }
 
-            /* Prevent iPhone horizontal scroll */
-            html {
-                overflow-x: hidden !important;
-            }
-
-            #modalOverlay {
-                overflow-x: hidden !important;
-            }
-
-            /* Larger tables on mobile */
             .table-circle {
                 transform: scale(1.15);
             }
@@ -147,32 +119,17 @@
             .table-rect {
                 height: 80% !important;
             }
-
-            /* Add space below Buffet */
-            .floor-area:nth-child(1) {
-                margin-bottom: 12px;
-            }
-
-            /* Spacing between entrances */
-            .floor-area:nth-child(5),
-            .floor-area:nth-child(6) {
-                margin-left: 4px;
-                margin-right: 4px;
-            }
         }
     </style>
 </head>
 
 <body class="bg-black text-zinc-300 h-screen flex flex-col font-sans pb-20">
-    <!-- Added pb-20 to body to account for fixed footer -->
-
     <header class="bg-zinc-900 shadow-lg z-30 flex-none border-b border-zinc-800">
         <div class="max-w-md mx-auto px-4 py-4">
             <h1 class="text-xl font-bold text-center text-zinc-100 mb-2">Seating Plan</h1>
-
             <div class="relative">
                 <input type="text" id="searchInput" placeholder="Search for a guest..."
-                    class="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent text-sm shadow-sm transition-all">
+                    class="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent text-sm shadow-sm transition-all" />
                 <svg class="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -187,33 +144,29 @@
     </header>
 
     <main class="flex-grow relative overflow-hidden flex flex-col">
-
         <div class="md:hidden flex justify-center py-2 space-x-4 bg-zinc-950 border-b border-zinc-800">
             <button id="btnMap"
-                class="px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors">Map
-                View</button>
+                class="px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors">
+                Map View
+            </button>
             <button id="btnList"
-                class="px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700">Table
-                List</button>
+                class="px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700">
+                Table List
+            </button>
         </div>
 
         <div class="relative flex-grow overflow-hidden">
-
-            <!-- Added mobile-padded-view class for padding on small screens -->
             <div id="mapView"
-                class="w-full h-full overflow-auto bg-zinc-950 flex justify-center p-0 md:p-4 mobile-padded-view">
+                class="w-full h-full overflow-auto bg-zinc-950 flex justify-center p-0 md:p-4 map-container">
                 <div class="scale-wrapper flex justify-center">
-                    <div id="floorPlan" class="floor-grid shadow-lg rounded-xl">
-                    </div>
+                    <div id="floorPlan" class="floor-grid shadow-lg rounded-xl"></div>
                 </div>
             </div>
 
             <div id="listView" class="absolute inset-0 bg-zinc-950 z-20 overflow-y-auto hidden p-4 pb-20">
                 <h2 class="text-lg font-bold mb-4 px-2 text-zinc-100">All Tables</h2>
-                <div id="listContainer" class="grid gap-3 grid-cols-1">
-                </div>
+                <div id="listContainer" class="grid gap-3 grid-cols-1"></div>
             </div>
-
         </div>
     </main>
 
@@ -221,13 +174,13 @@
         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div id="modalContent"
             class="bg-zinc-900 w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300 flex flex-col max-h-[85vh]">
-
             <div
                 class="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-purple-900/20 rounded-t-2xl">
                 <div>
-                    <h3 class="text-xl font-bold text-zinc-100" id="modalTitle">Table 1</h3>
-                    <!-- Changed secondary text to gold -->
-                    <p class="text-xs text-amber-400 font-medium uppercase tracking-wider mt-0.5">Guest List</p>
+                    <h3 class="text-xl font-bold text-zinc-100" id="modalTitle">Table</h3>
+                    <p class="text-xs text-amber-400 font-medium uppercase tracking-wider mt-0.5">
+                        Guest List
+                    </p>
                 </div>
                 <button id="closeModal"
                     class="p-2 bg-zinc-800 rounded-full text-zinc-400 hover:text-zinc-200 shadow-sm hover:shadow transition-all">
@@ -239,8 +192,7 @@
             </div>
 
             <div class="p-6 overflow-y-auto">
-                <ul id="modalGuestList" class="space-y-2">
-                </ul>
+                <ul id="modalGuestList" class="space-y-2"></ul>
             </div>
 
             <div class="p-4 border-t border-zinc-800 bg-zinc-950 rounded-b-2xl text-center text-xs text-zinc-500">
@@ -249,9 +201,7 @@
         </div>
     </div>
 
-    <!-- Floating Footer Button for Navigation -->
     <footer class="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 p-4 z-40 shadow-2xl">
-        <!-- ADDED target="_self" to ensure navigation happens in the current tab/window -->
         <a href="https://mathurin93.github.io/DB/" target="_self"
             class="w-full block text-center bg-purple-700 hover:bg-purple-600 transition-colors duration-200 text-zinc-200 font-semibold py-3 rounded-xl shadow-lg md:max-w-xs md:mx-auto">
             &larr; Go Back to Main Site
@@ -261,83 +211,35 @@
     <script>
         // --- Data: Tables & Guests ---
         const tablesData = [
-            // Head Table - Position changed to 'stage'
             { id: 'HT', label: 'Head Table', type: 'rect', pos: 'stage', guests: ["Brown David", "Brown Melleta"] },
 
-            // Row 2 (Bottom Right)
             { id: 1, type: 'rect', pos: 'r2-c7', guests: ["Brown Claud", "Edwards Gervan", "Edwards Marlene", "Ford Claudeth", "Linton Josephine", "Linton-Brown Jea", "Saunders Cynthia", "Broomes Janan", "Roban Victor"] },
-
-            // Row 1 (Top Right)
             { id: 2, type: 'circle', pos: 'r1-c7', guests: ["Brown Deta", "Hackett Noel", "Hackett Oliven", "Henry Walcott", "Hibbert Melvina", "Lewis George", "Lynch Sofia", "Mcleod Eva", "Reid Dexter", "Reid Shirley"] },
-
-            // Row 2 (Right)
             { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Beckford Antonette", "Brown Charmaine", "Brown Errol", "Cole Avery", "Cole Brielle", "Cole Keaton", "Hackett Ann-Mari", "Hackett Radcliffe", "Hackett Vianne"] },
-
-            // Row 1 (Top Right)
             { id: 4, type: 'circle', pos: 'r1-c6', guests: ["Graham Diana", "Graham Paul", "Johnson Delroy", "Johnson June", "Reynolds Pauline", "Severin Barbara", "Williams Bill", "Williams Janet"] },
-
-            // Row 2 (Left)
             { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Treleven Marva", "Wisdom Sandra"] },
-
-            // Row 1 (Top Left)
             { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blackstock Denton", "Blackstock Venise", "Bryan Leonard", "Bryan Petronah", "Cousins Christine", "Cousins Marcel", "Guthrie Barbara", "Maxwell Kenneth", "McLaughlin Ivy", "McLaughlin Sonia"] },
-
-            // Row 2 (Left)
             { id: 7, type: 'circle', pos: 'r2-c3', guests: ["Baptiste Delores", "Coppin Chileta", "Goodridge Angela", "Jackson Marcia", "Levy Ann Marie", "Levy Loyton", "Lewis Edward", "Mckoy Paulette", "Pitters Yvette", "Rattray Valerie"] },
-
-            // Row 1 (Top Left)
             { id: 8, type: 'circle', pos: 'r1-c3', guests: ["Blair Dwayne", "Blair Patricia", "Butler Leroy", "Butler Wendy", "Douglas Gary", "Douglas Priscilla", "Ricketts Chase", "Ricketts Melonie", "Rose Andrew", "Rose Brenda"] },
-
-            // Row 2 (Left)
             { id: 9, type: 'circle', pos: 'r2-c2', guests: ["Anderson Nicole", "Anderson Ralston", "Griffith Ann-Mari", "Griffith Marlon", "Hunte Leroy", "Hunte Maureen", "Smith Alicia", "Smith Gary", "Spence Ezekiel", "Spence Lincoln"] },
-
-            // Row 1 (Top Left)
             { id: 10, type: 'circle', pos: 'r1-c2', guests: ["Clemeston Doree", "Clemeston Miche", "Comrie Clive", "Duncan Clarence", "Duncan Lydia", "James Loralee", "Lorray Elizabeth", "Smith Desline", "Walsh Clifford"] },
-
-            // Row 2 (Left)
             { id: 11, type: 'circle', pos: 'r2-c1', guests: ["Barrett Kingsley", "Barrett Lillian", "Dawns Dawn", "Ford Donna", "Lambert Sheril", "Marcia Clarke", "Peart Angie", "Peart Percy", "Williams Pauline", "Graham David"] },
-
-            // Row 1 (Top Left)
             { id: 12, type: 'circle', pos: 'r1-c1', guests: ["Clemeston Kristine", "Clemeston Nazheme", "Gordon Janet", "Gordon Leroy", "Johnson Cara", "Longmore Daniel", "Lorray Sarah", "Williams Emma", "Peart Marc"] },
-
-            // Row 3 (Right)
             { id: 13, type: 'rect', pos: 'r3-c7', guests: ["Brown Laurie Ann", "Brown Vanessa", "Foster Odette", "James Aria", "James Desmond", "James Jayna", "James Natasha", "Sargeant Omari", "Sargeant Deborah"] },
-
-            // Row 4 (Right)
             { id: 14, type: 'circle', pos: 'r4-c7', guests: ["Davis Cherell", "Davis Robert", "Foster Goldwyn", "Foster Jason", "Foster Shimyka", "Hibbert John Jr.", "Maxwell Noreen", "Newell Simone", "Reid Judeth"] },
-
-            // Row 3 (Right)
             { id: 15, type: 'circle', pos: 'r3-c6', guests: ["Foster Justin", "Fraser Jalesa", "Fraser Jason", "Gordon Brandi", "Hackett Felicia", "Manhertz Brittney", "Manhertz Michael", "Robinson Bethany", "Robinson Mathurin", "Wisdom Corey"] },
-
-            // Row 4 (Right)
             { id: 16, type: 'circle', pos: 'r4-c6', guests: ["Anderson Brittanya", "Anderson Keana", "Lynch Josiah", "Lynch Samantha", "Mushett Andrew", "Foster Jaida", "James Darius", "Lake Toriyah", "Wesley Jada"] },
-
-            // Row 3 (Left)
             { id: 17, type: 'circle', pos: 'r3-c4', guests: ["Blagrove Carol", "Blagrove Maurice", "Byfield Althea", "Byfield Devon", "Green Dawn", "Green Howard", "Mitchell Dion", "Mitchell Kedisha", "Rose Althea", "Rose Denrick"] },
-
-            // Row 4 (Left)
             { id: 18, type: 'circle', pos: 'r4-c4', guests: ["Antonette Scott", "Dalton Scott", "Dixon Donovan", "Kelly Ian", "Kelly Nicole", "Lee Peter", "Soprano Scott", "Thompson Charmaine", "Wallace Shawn", "Young-Dixon Sanja"] },
-
-            // Row 3 (Left)
             { id: 19, type: 'circle', pos: 'r3-c3', guests: ["Bennett Ricardo", "Cubitt Mark", "Cubitt Michelle", "Hall Kerryann", "Hall Michael", "Halstead Kirk", "Halstead Nadine", "St. Louis Anthony", "St. Louis Michelle", "Wallace-Bennett L"] },
-
-            // Row 4 (Left)
             { id: 20, type: 'circle', pos: 'r4-c3', guests: ["Anderson Tanesha", "Bell Angélique", "Comrie Allison", "Comrie Sherry", "Duff Christopher", "Graham Latoya", "Graham Latoya", "Lake Nathania", "Treleven Susie"] },
-
-            // Row 3 (Left)
             { id: 21, type: 'circle', pos: 'r3-c2', guests: ["Ann Marie Thom", "Edwards-Ledger", "George Tashieka", "Jameson Verness", "Ledger Jeffrey", "McKoy Audley", "McKoy Geisell", "McKoy Ramona", "Rodney Roxan", "Winsome Wesley"] },
-
-            // Row 4 (Left)
             { id: 22, type: 'circle', pos: 'r4-c2', guests: ["Clarke Ronjay", "Clarke Sashane", "Gordon Shari", "Jameson Verness", "Lynch Marseenia", "Olivierre Kelton", "Olivierre Sigri", "Solomon Caitlyn", "Solomon Shanne"] },
-
-            // Row 3 (Left)
             { id: 23, type: 'circle', pos: 'r3-c1', guests: ["Byfield Nathaniel", "Byfield Rennae", "Chambers Matti", "Hibbert Maquetia", "Hibbert Mark", "Nichols Joanna", "Nichols O'Brian", "Rose Ricardo", "Severin David"] },
-
-            // Row 4 (Left)
             { id: 24, type: 'circle', pos: 'r4-c1', guests: ["Clarke Adriel", "Clarke Yashime", "Douglas Diondra", "Douglas Diandra", "Hibbert Maquetia", "Kayla McLean", "Lake Yosephine", "Cousins Christopher", "Cousins Lydia", "Cousins Samantha", "Phillip McLean"] }
         ];
 
-        // --- Configuration & DOM ---
+        // --- DOM references ---
         const floorPlan = document.getElementById('floorPlan');
         const modalOverlay = document.getElementById('modalOverlay');
         const modalContent = document.getElementById('modalContent');
@@ -348,9 +250,10 @@
         const mapView = document.getElementById('mapView');
         const listView = document.getElementById('listView');
 
-        // Global variable to track the current highlight/modal timeout
         let currentHighlightTimeout = null;
-        // CSS Grid mapping matching the image logic (DEFAULT/DESKTOP)
+        let resizeTimeout = null;
+
+        // --- Grid mapping (16 columns) ---
         const posMapDesktop = {
             'r1-c1': 'grid-area: 2 / 2 / 4 / 4;', 'r1-c2': 'grid-area: 2 / 4 / 4 / 6;', 'r1-c3': 'grid-area: 2 / 6 / 4 / 8;', 'r1-c4': 'grid-area: 2 / 8 / 4 / 10;',
             'r1-c6': 'grid-area: 2 / 11 / 4 / 13;', 'r1-c7': 'grid-area: 2 / 13 / 4 / 15;',
@@ -372,20 +275,18 @@
             'r4-c1': 'grid-area: 10 / 2 / 12 / 4;', 'r4-c2': 'grid-area: 10 / 4 / 12 / 6;', 'r4-c3': 'grid-area: 10 / 6 / 12 / 8;', 'r4-c4': 'grid-area: 10 / 8 / 12 / 10;',
             'r4-c6': 'grid-area: 10 / 11 / 12 / 13;', 'r4-c7': 'grid-area: 10 / 13 / 12 / 15;',
         };
+
         function getLayoutConfig() {
             const isMobile = window.innerWidth <= 768;
-            let config = {};
-
-            // Shared color palette for static elements (Zinc shades)
             const ZINC_700 = '#3f3f46';
             const ZINC_600 = '#52525b';
             const ZINC_200 = '#d4d4d8';
             const ZINC_400 = '#a1a1aa';
-            // Purple for Entrance borders (Purple-400)
             const PURPLE_400 = '#c084fc';
 
+            const config = {};
+
             if (isMobile) {
-                // Mobile Configuration
                 config.posMap = posMapMobile;
                 config.htStyle = 'grid-area: 4 / 15 / 10 / 16; writing-mode: vertical-rl;';
 
@@ -394,13 +295,10 @@
                     { name: 'Foyer', style: `grid-area: 11 / 9 / 16 / 16; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
                     { name: 'Bar', style: `grid-area: 12 / 4 / 13 / 9; margin-bottom: 8px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
                     { name: 'Reception', style: `grid-area: 13 / 4 / 14 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
-                    // Entrance borders changed from white to PURPLE_400
-                    { name: 'Entrance', style: `grid-area: 15 / 2 / 15 / 9; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
-                    { name: 'Foyer Entrance', style: `grid-area: 15 / 9 / 15 / 15; background: #27272a; color: white; border: 1px solid ${PURPLE_400}; text-align: center;` },
+                    { name: 'Entrance', style: `grid-area: 15 / 2 / 16 / 9; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
+                    { name: 'Foyer Entrance', style: `grid-area: 15 / 9 / 16 / 15; background: #27272a; color: white; border: 1px solid ${PURPLE_400}; text-align: center;` },
                 ];
-
             } else {
-                // Desktop Configuration
                 config.posMap = posMapDesktop;
                 config.htStyle = 'grid-area: 5 / 15 / 11 / 16; writing-mode: vertical-rl;';
 
@@ -409,7 +307,6 @@
                     { name: 'Bar', style: `grid-area: 15 / 4 / 16 / 9; margin-top: 10px; margin-bottom: 10px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
                     { name: 'Reception', style: `grid-area: 16 / 4 / 17 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
                     { name: 'Foyer', style: `grid-area: 15 / 9 / 16 / 16; margin-top: 8px; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
-                    // Entrance borders changed from white to PURPLE_400
                     { name: 'Entrance', style: `grid-area: 17 / 2 / 18 / 9; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
                     { name: 'Foyer Entrance', style: `grid-area: 17 / 9 / 18 / 15; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
                 ];
@@ -417,30 +314,29 @@
 
             return config;
         }
+
         function renderMap() {
             floorPlan.innerHTML = '';
             const { posMap, staticElements, htStyle } = getLayoutConfig();
 
-            // 1. Add Static Floor Elements
+            // Static floor elements
             staticElements.forEach(el => {
                 const div = document.createElement('div');
                 div.className = 'floor-area shadow-sm rounded';
-                div.style = el.style;
+                div.style.cssText = el.style;
                 div.innerText = el.name;
                 floorPlan.appendChild(div);
             });
 
-            // 2. Add Tables
+            // Tables
             tablesData.forEach(table => {
                 const el = document.createElement('div');
                 el.dataset.id = table.id;
                 el.addEventListener('click', () => openModal(table));
 
-                // Special handling for Head Table (using purple background with gold border/text)
                 if (table.id === 'HT') {
-                    el.style.cssText += htStyle;
-                    // Updated Head Table styles for gold accents
                     el.className = 'table-rect bg-purple-800 border-2 border-amber-400 text-amber-400 font-bold text-base shadow-lg cursor-pointer hover:border-amber-300 hover:bg-purple-700';
+                    el.style.cssText = htStyle;
                     el.style.width = '100%';
                     el.style.height = '100%';
                     el.innerText = table.label;
@@ -448,7 +344,6 @@
                     return;
                 }
 
-                // Regular tables (circle or rect) - using gold text for table ID
                 if (table.type === 'circle') {
                     el.className = 'table-circle bg-zinc-800 border-2 border-zinc-700 text-amber-400 font-bold text-lg shadow-md cursor-pointer hover:border-amber-500 hover:text-amber-300';
                 } else {
@@ -459,7 +354,6 @@
                     }
                 }
 
-                // Apply grid placement
                 if (posMap[table.pos]) {
                     el.style.cssText += posMap[table.pos];
                     el.innerText = table.label ? table.label : table.id;
@@ -471,59 +365,69 @@
         function renderListView() {
             const container = document.getElementById('listContainer');
             container.innerHTML = '';
+
             tablesData
                 .slice()
                 .sort((a, b) => {
                     if (a.id === 'HT') return -1;
                     if (b.id === 'HT') return 1;
-                    return (a.id - b.id);
+                    return a.id - b.id;
                 })
                 .forEach(table => {
                     const card = document.createElement('div');
-                    card.className = 'bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:bg-zinc-800 transition-colors cursor-pointer';
+                    card.className =
+                        'bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:bg-zinc-800 transition-colors cursor-pointer';
                     card.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
-                    <!-- Changed list table title text to gold -->
-                    <span class="font-bold text-lg text-amber-400">${table.label || 'Table ' + table.id}</span>
-                    <span class="text-xs text-zinc-400 bg-zinc-800 px-2 py-1 rounded-full">${table.guests.length} Guests</span>
-                </div>
-                <p class="text-sm text-zinc-400 truncate">${table.guests.join(', ')}</p>
-            `;
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-bold text-lg text-amber-400">${table.label || 'Table ' + table.id
+                        }</span>
+            <span class="text-xs text-zinc-400 bg-zinc-800 px-2 py-1 rounded-full">${table.guests.length
+                        } Guests</span>
+          </div>
+          <p class="text-sm text-zinc-400 truncate">${table.guests.join(', ')}</p>
+        `;
                     card.addEventListener('click', () => openModal(table));
                     container.appendChild(card);
                 });
         }
 
         function openModal(table) {
-            document.getElementById('modalTitle').innerText = table.label || `Table ${table.id}`;
+            document.getElementById('modalTitle').innerText =
+                table.label || `Table ${table.id}`;
             const list = document.getElementById('modalGuestList');
             list.innerHTML = '';
 
             table.guests.forEach(guest => {
                 const li = document.createElement('li');
-                li.className = 'flex items-center space-x-3 py-2 border-b border-zinc-800 last:border-0';
+                li.className =
+                    'flex items-center space-x-3 py-2 border-b border-zinc-800 last:border-0';
                 li.innerHTML = `
-            <!-- Changed guest initial icon background and text to gold -->
-            <div class="w-8 h-8 rounded-full bg-amber-900/40 flex items-center justify-center text-amber-400 font-bold text-xs">
-                ${guest.charAt(0)}
-            </div>
-            <span class="text-zinc-200 font-medium">${guest}</span>
-        `;
+        <div class="w-8 h-8 rounded-full bg-amber-900/40 flex items-center justify-center text-amber-400 font-bold text-xs">
+          ${guest.charAt(0)}
+        </div>
+        <span class="text-zinc-200 font-medium">${guest}</span>
+      `;
                 list.appendChild(li);
             });
 
+            // Lock background scroll
+            document.body.style.overflow = 'hidden';
+
             modalOverlay.classList.remove('hidden');
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 modalOverlay.classList.remove('opacity-0');
                 modalContent.classList.remove('translate-y-full');
-            }, 10);
+            });
         }
 
         function closeModalFn() {
             modalOverlay.classList.add('opacity-0');
             modalContent.classList.add('translate-y-full');
+
             setTimeout(() => {
                 modalOverlay.classList.add('hidden');
+                // Restore background scroll
+                document.body.style.overflow = '';
             }, 300);
         }
 
@@ -531,64 +435,80 @@
             if (view === 'map') {
                 mapView.classList.remove('hidden');
                 listView.classList.add('hidden');
-                btnMap.className = "px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors";
-                btnList.className = "px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700";
+                btnMap.className =
+                    'px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors';
+                btnList.className =
+                    'px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700';
             } else {
                 mapView.classList.add('hidden');
                 listView.classList.remove('hidden');
-                btnMap.className = "px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700";
-                btnList.className = "px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors";
+                btnMap.className =
+                    'px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700';
+                btnList.className =
+                    'px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors';
                 renderListView();
             }
-            renderMap();
         }
-        /**
-         * Finds and highlights a table on the map view, ensuring it's visible.
-         * @param {string|number} tableId The ID of the table to highlight.
-         */
+
+        function centerTableInView(tableElement) {
+            const container = mapView;
+            const rect = tableElement.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            const offsetTop =
+                rect.top -
+                containerRect.top -
+                container.clientHeight / 2 +
+                rect.height / 2;
+            const offsetLeft =
+                rect.left -
+                containerRect.left -
+                container.clientWidth / 2 +
+                rect.width / 2;
+
+            container.scrollTo({
+                top: container.scrollTop + offsetTop,
+                left: container.scrollLeft + offsetLeft,
+                behavior: 'smooth',
+            });
+        }
+
         function highlightTable(tableId) {
-            // 0. Clear any pending highlight/modal action if a new search is performed
             if (currentHighlightTimeout) {
                 clearTimeout(currentHighlightTimeout);
                 currentHighlightTimeout = null;
             }
 
-            // 1. Ensure Map View is active
             switchView('map');
 
-            // 2. Remove highlight from all other tables
             document.querySelectorAll('.highlighted').forEach(el => {
                 el.classList.remove('highlighted');
             });
 
-            const tableElement = document.querySelector(`[data-id="${tableId}"]`);
-            // Ensure we find the table object data
-            const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
+            // Wait a frame so the DOM is in the right view
+            requestAnimationFrame(() => {
+                const tableElement = document.querySelector(`[data-id="${tableId}"]`);
+                const tableData = tablesData.find(
+                    t => t.id == tableId || t.id == String(tableId)
+                );
 
-            if (tableElement && tableData) {
-                // 3. Scroll the table into the center of the scrollable area (#mapView)
-                tableElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                    inline: 'center'
-                });
+                if (tableElement && tableData) {
+                    centerTableInView(tableElement);
+                    tableElement.classList.add('highlighted');
 
-                // 4. Add highlight class to start the 3.0s animation
-                tableElement.classList.add('highlighted');
+                    currentHighlightTimeout = setTimeout(() => {
+                        tableElement.classList.remove('highlighted');
 
-                // 5. Set timeout to stop flashing and open the modal (3000ms = 1.5s * 2 animation cycles)
-                currentHighlightTimeout = setTimeout(() => {
-                    // Remove highlight class to stop any lingering effects
-                    tableElement.classList.remove('highlighted');
-
-                    // Open the modal immediately after the flash stops
-                    openModal(tableData);
-
-                    // Clear the tracking variable
-                    currentHighlightTimeout = null;
-                }, 3000);
-            }
+                        // Slight delay after animation to avoid jank on Android
+                        setTimeout(() => {
+                            openModal(tableData);
+                            currentHighlightTimeout = null;
+                        }, 150);
+                    }, 3000);
+                }
+            });
         }
+
         function handleSearch(e) {
             const term = e.target.value.toLowerCase();
             searchResults.innerHTML = '';
@@ -611,14 +531,14 @@
                 searchResults.classList.remove('hidden');
                 results.forEach(res => {
                     const div = document.createElement('div');
-                    div.className = 'px-4 py-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-900 last:border-0';
+                    div.className =
+                        'px-4 py-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-900 last:border-0';
                     div.innerHTML = `
-                <div class="font-medium text-zinc-100">${res.guest}</div>
-                <!-- Changed search result table label to gold -->
-                <div class="text-xs text-amber-400 font-bold">${res.table.label || 'Table ' + res.table.id}</div>
-            `;
+          <div class="font-medium text-zinc-100">${res.guest}</div>
+          <div class="text-xs text-amber-400 font-bold">${res.table.label || 'Table ' + res.table.id
+                        }</div>
+        `;
                     div.addEventListener('click', () => {
-                        // This triggers the highlight and sets the 3-second delay for the modal
                         highlightTable(res.table.id);
                         searchResults.classList.add('hidden');
                         searchInput.value = '';
@@ -634,23 +554,37 @@
             }
         }
 
-        // --- Initialization and Event Listeners ---
+        // Close search results on outside click
+        document.addEventListener('click', (e) => {
+            if (
+                !searchResults.contains(e.target) &&
+                e.target !== searchInput
+            ) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        // --- Event Listeners ---
         document.getElementById('closeModal').addEventListener('click', closeModalFn);
-        // Added modal overlay click to close functionality
-        modalOverlay.addEventListener('click', (e) => {
+
+        modalOverlay.addEventListener('click', e => {
             if (e.target === modalOverlay) closeModalFn();
         });
+
         searchInput.addEventListener('input', handleSearch);
         btnMap.addEventListener('click', () => switchView('map'));
         btnList.addEventListener('click', () => switchView('list'));
 
-        window.addEventListener('resize', renderMap);
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                renderMap();
+            }, 200);
+        });
 
         // Init
         renderMap();
         renderListView();
-
-
     </script>
 </body>
 
