@@ -1,671 +1,710 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reception Seating Plan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        html,
-        body {
-            overflow-x: hidden;
-        }
-
-        .map-container {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .map-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .table-circle,
-        .table-rect {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            will-change: transform, opacity;
-        }
-
-        .table-circle {
-            border-radius: 50%;
-            aspect-ratio: 1 / 1;
-        }
-
-        .table-rect {
-            border-radius: 8px;
-        }
-
-        /* --------------------------------------------- */
-        /* ANDROID-SAFE BLINKING ANIMATION (NO BOX-SHADOW) */
-        /* --------------------------------------------- */
-
-        @-webkit-keyframes blink-android-safe {
-            0%,
-            55% {
-                opacity: 1;
-                transform: scale(1);
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Reception Seating Plan</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            html,
+            body {
+                overflow-x: hidden;
             }
 
-            56%,
-            100% {
-                opacity: 0.35;
-                transform: scale(1.1);
-            }
-        }
-        @-moz-keyframes blink-android-safe {
-            0%,
-            55% {
-                opacity: 1;
-                transform: scale(1);
+            .map-container {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
             }
 
-            56%,
-            100% {
-                opacity: 0.35;
-                transform: scale(1.1);
-            }
-        }
-        @-ms-keyframes blink-android-safe {
-            0%,
-            55% {
-                opacity: 1;
-                transform: scale(1);
+            .map-container::-webkit-scrollbar {
+                display: none;
             }
 
-            56%,
-            100% {
-                opacity: 0.35;
-                transform: scale(1.1);
-            }
-        }
-        @-o-keyframes blink-android-safe {
-            0%,
-            55% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            56%,
-            100% {
-                opacity: 0.35;
-                transform: scale(1.1);
-            }
-        }
-
-        @keyframes blink-android-safe {
-            0%,
-            55% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            56%,
-            100% {
-                opacity: 0.35;
-                transform: scale(1.1);
-            }
-        }
-
-        .highlighted {
-            background-color: #a855f7 !important;
-            color: white !important;
-            border-color: #a855f7 !important;
-            -webkit-animation: blink-android-safe 0.7s ease-in-out 5;
-            -moz-animation: blink-android-safe 0.7s ease-in-out 5;
-            -ms-animation: blink-android-safe 0.7s ease-in-out 5;
-            -o-animation: blink-android-safe 0.7s ease-in-out 5;
-            animation: blink-android-safe 0.7s ease-in-out 5 !important;
-            z-index: 20;
-
-            transition: all 0.3s ease;
-        }
-
-        /* --------------------------------------------- */
-        /* FLOOR PLAN STYLES (unchanged) */
-        /* --------------------------------------------- */
-
-        .floor-area {
-            background-color: #3f3f46;
-            color: #d4d4d8;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.75rem;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .floor-grid {
-            display: grid;
-            grid-template-columns: repeat(16, 1fr);
-            grid-template-rows: repeat(18, 1fr);
-            gap: 10px;
-            width: 100%;
-            max-width: 900px;
-            height: 900px;
-            background-color: #18181b;
-            border: 2px solid #27272a;
-            padding: 20px;
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .scale-wrapper {
-            width: 100%;
-            overflow: auto;
-            position: relative;
-        }
-
-        @media (max-width: 768px) {
-            .floor-grid {
-                grid-template-rows: repeat(14, 1fr);
-                max-height: 650px;
-                overflow: hidden;
-                gap: 10px;
-                width: calc(100vw - 2rem - 8px);
-                min-width: 350px;
-                padding: 10px;
-                margin-bottom: 10px;
+            .table-circle,
+            .table-rect {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+                will-change: transform, opacity;
             }
 
             .table-circle {
-                transform: scale(1.15);
+                border-radius: 50%;
+                aspect-ratio: 1 / 1;
             }
 
             .table-rect {
-                height: 80% !important;
+                border-radius: 8px;
             }
-        }
-    </style>
 
-</head>
+            /* --------------------------------------------- */
+            /* ANDROID-SAFE BLINKING ANIMATION (NO BOX-SHADOW) */
+            /* --------------------------------------------- */
 
-<body class="bg-black text-zinc-300 font-sans min-h-screen flex flex-col">
+            @-webkit-keyframes blink-android-safe {
 
-    <header class="bg-zinc-900 shadow-lg z-30 flex-none border-b border-zinc-800">
-        <div class="max-w-md mx-auto px-4 py-4">
-            <h1 class="text-xl font-bold text-center text-zinc-100 mb-2">Seating Plan</h1>
-            <div class="relative">
-                <input type="text" id="searchInput" placeholder="Search for a guest..."
-                    class="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent text-sm shadow-sm transition-all" />
-                <svg class="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
+                0%,
+                55% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
 
-                <div id="searchResults"
-                    class="absolute top-full left-0 right-0 mt-1 bg-zinc-800 rounded-lg shadow-xl border border-zinc-700 hidden max-h-60 overflow-y-auto z-50">
-                </div>
-            </div>
-        </div>
-    </header>
+                56%,
+                100% {
+                    opacity: 0.35;
+                    transform: scale(1.1);
+                }
+            }
 
-    <main class="relative overflow-hidden flex flex-col flex-grow">
+            @-moz-keyframes blink-android-safe {
 
-        <!-- Mobile view switch buttons - Ensure this doesn't collapse the view below it -->
-        <div class="md:hidden flex justify-center py-2 space-x-4 bg-zinc-950 border-b border-zinc-800 flex-none">
-            <button id="btnMap"
-                class="px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors">
-                Map View
-            </button>
-            <button id="btnList"
-                class="px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700">
-                Table List
-            </button>
-        </div>
+                0%,
+                55% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
 
-        <!-- Main View Container: Must take up all remaining height of the main element -->
-        <div class="relative overflow-hidden flex-grow">
+                56%,
+                100% {
+                    opacity: 0.35;
+                    transform: scale(1.1);
+                }
+            }
 
-            <div id="mapView" class="w-full overflow-auto  bg-zinc-950 flex justify-center p-0 md:p-4 map-container">
-                <div class="scale-wrapper flex justify-center">
-                    <div id="floorPlan" class="floor-grid shadow-lg rounded-xl"></div>
-                </div>
-            </div>
+            @-ms-keyframes blink-android-safe {
 
-            <!-- List View: Absolutely positioned to fill the height of its parent (which is now full-height) -->
-            <div id="listView" class="absolute inset-0 bg-zinc-950 z-20 overflow-y-auto hidden p-4 pb-20">
-                <h2 class="text-lg font-bold mb-4 px-2 text-zinc-100">All Tables</h2>
-                <div id="listContainer" class="grid gap-3 grid-cols-1"></div>
-            </div>
-        </div>
-    </main>
+                0%,
+                55% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
 
-    <div id="modalOverlay"
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div id="modalContent"
-            class="bg-zinc-900 w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300 flex flex-col max-h-[85vh]">
-            <div
-                class="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-purple-900/20 rounded-t-2xl">
-                <div>
-                    <h3 class="text-xl font-bold text-zinc-100" id="modalTitle">Table</h3>
-                    <p class="text-xs text-amber-400 font-medium uppercase tracking-wider mt-0.5">
-                        Guest List
-                    </p>
-                </div>
-                <button id="closeModal"
-                    class="p-2 bg-zinc-800 rounded-full text-zinc-400 hover:text-zinc-200 shadow-sm hover:shadow transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
+                56%,
+                100% {
+                    opacity: 0.35;
+                    transform: scale(1.1);
+                }
+            }
+
+            @-o-keyframes blink-android-safe {
+
+                0%,
+                55% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+
+                56%,
+                100% {
+                    opacity: 0.35;
+                    transform: scale(1.1);
+                }
+            }
+
+            @keyframes blink-android-safe {
+
+                0%,
+                55% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+
+                56%,
+                100% {
+                    opacity: 0.35;
+                    transform: scale(1.1);
+                }
+            }
+
+            .highlighted {
+                background-color: #a855f7 !important;
+                color: white !important;
+                border-color: #a855f7 !important;
+                -webkit-animation: blink-android-safe 0.7s ease-in-out 5;
+                -moz-animation: blink-android-safe 0.7s ease-in-out 5;
+                -ms-animation: blink-android-safe 0.7s ease-in-out 5;
+                -o-animation: blink-android-safe 0.7s ease-in-out 5;
+                animation: blink-android-safe 0.7s ease-in-out 5 !important;
+                z-index: 20;
+
+                transition: all 0.3s ease;
+            }
+
+            /* --------------------------------------------- */
+            /* FLOOR PLAN STYLES (unchanged) */
+            /* --------------------------------------------- */
+
+            .floor-area {
+                background-color: #3f3f46;
+                color: #d4d4d8;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                font-size: 0.75rem;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .floor-grid {
+                display: grid;
+                grid-template-columns: repeat(16, 1fr);
+                grid-template-rows: repeat(18, 1fr);
+                gap: 10px;
+                width: 100%;
+                max-width: 900px;
+                height: 900px;
+                background-color: #18181b;
+                border: 2px solid #27272a;
+                padding: 20px;
+                position: relative;
+                margin-bottom: 20px;
+            }
+
+            .scale-wrapper {
+                width: 100%;
+                overflow: auto;
+                position: relative;
+            }
+
+            @media (max-width: 768px) {
+                .floor-grid {
+                    grid-template-rows: repeat(14, 1fr);
+                    max-height: 650px;
+                    overflow: hidden;
+                    gap: 10px;
+                    width: calc(100vw - 2rem - 8px);
+                    min-width: 350px;
+                    padding: 10px;
+                    margin-bottom: 10px;
+                }
+
+                .table-circle {
+                    transform: scale(1.15);
+                }
+
+                .table-rect {
+                    height: 80% !important;
+                }
+            }
+        </style>
+
+    </head>
+
+    <body class="bg-black text-zinc-300 font-sans min-h-screen flex flex-col">
+
+        <header class="bg-zinc-900 shadow-lg z-30 flex-none border-b border-zinc-800">
+            <div class="max-w-md mx-auto px-4 py-4">
+                <h1 class="text-xl font-bold text-center text-zinc-100 mb-2">Seating Plan</h1>
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Search for a guest..."
+                        class="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent text-sm shadow-sm transition-all" />
+                    <svg class="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
+
+                    <div id="searchResults"
+                        class="absolute top-full left-0 right-0 mt-1 bg-zinc-800 rounded-lg shadow-xl border border-zinc-700 hidden max-h-60 overflow-y-auto z-50">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="relative overflow-hidden flex flex-col flex-grow">
+
+            <!-- Mobile view switch buttons - Ensure this doesn't collapse the view below it -->
+            <div class="md:hidden flex justify-center py-2 space-x-4 bg-zinc-950 border-b border-zinc-800 flex-none">
+                <button id="btnMap"
+                    class="px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors">
+                    Map View
+                </button>
+                <button id="btnList"
+                    class="px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700">
+                    Table List
                 </button>
             </div>
 
-            <div class="p-6 overflow-y-auto">
-                <ul id="modalGuestList" class="space-y-2"></ul>
-            </div>
+            <!-- Main View Container: Must take up all remaining height of the main element -->
+            <div class="relative overflow-hidden flex-grow">
 
-            <div class="p-4 border-t border-zinc-800 bg-zinc-950 rounded-b-2xl text-center text-xs text-zinc-500">
-                Reception Seating
+                <div id="mapView"
+                    class="w-full overflow-auto  bg-zinc-950 flex justify-center p-0 md:p-4 map-container">
+                    <div class="scale-wrapper flex justify-center">
+                        <div id="floorPlan" class="floor-grid shadow-lg rounded-xl"></div>
+                    </div>
+                </div>
+
+                <!-- List View: Absolutely positioned to fill the height of its parent (which is now full-height) -->
+                <div id="listView" class="absolute inset-0 bg-zinc-950 z-20 overflow-y-auto hidden p-4 pb-20">
+                    <h2 class="text-lg font-bold mb-4 px-2 text-zinc-100">All Tables</h2>
+                    <div id="listContainer" class="grid gap-3 grid-cols-1"></div>
+                </div>
+            </div>
+        </main>
+
+        <div id="modalOverlay"
+            class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div id="modalContent"
+                class="bg-zinc-900 w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300 flex flex-col max-h-[85vh]">
+                <div
+                    class="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-purple-900/20 rounded-t-2xl">
+                    <div>
+                        <h3 class="text-xl font-bold text-zinc-100" id="modalTitle">Table</h3>
+                        <p class="text-xs text-amber-400 font-medium uppercase tracking-wider mt-0.5">
+                            Guest List
+                        </p>
+                    </div>
+                    <button id="closeModal"
+                        class="p-2 bg-zinc-800 rounded-full text-zinc-400 hover:text-zinc-200 shadow-sm hover:shadow transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto">
+                    <ul id="modalGuestList" class="space-y-2"></ul>
+                </div>
+
+                <div class="p-4 border-t border-zinc-800 bg-zinc-950 rounded-b-2xl text-center text-xs text-zinc-500">
+                    Reception Seating
+                </div>
             </div>
         </div>
-    </div>
 
-    <footer class="w-full bg-zinc-900 border-t border-zinc-800 p-4 shadow-2xl mt-0 flex-none">
+        <footer class="w-full bg-zinc-900 border-t border-zinc-800 p-4 shadow-2xl mt-0 flex-none">
 
-        <a href="https://mathurin93.github.io/DB/" target="_self"
-            class="w-full block text-center bg-purple-700 hover:bg-purple-600 transition-colors duration-200 text-zinc-200 font-semibold py-3 rounded-xl shadow-lg md:max-w-xs md:mx-auto">
-            &larr; Go Back to Main Site
-        </a>
-    </footer>
+            <a href="https://mathurin93.github.io/DB/" target="_self"
+                class="w-full block text-center bg-purple-700 hover:bg-purple-600 transition-colors duration-200 text-zinc-200 font-semibold py-3 rounded-xl shadow-lg md:max-w-xs md:mx-auto">
+                &larr; Go Back to Main Site
+            </a>
+        </footer>
 
-    <script>
-        // --- Data: Tables & Guests ---
-        const tablesData = [
-            { id: 'HT', label: 'Head Table', type: 'rect', pos: 'stage', guests: ["Brown David", "Brown Melleta"] },
+        <script>
+            // --- Data: Tables & Guests ---
+            const tablesData = [
+                { id: 'HT', label: 'Head Table', type: 'rect', pos: 'stage', guests: ["Brown David", "Brown Melleta"] },
 
-            { id: 1, type: 'rect', pos: 'r2-c7', guests: ["Brown Claud", "Edwards Gervan", "Edwards Marlene", "Ford Claudeth", "Linton Josephine", "Linton-Brown Jean", "Saunders Cynthia"] },
-            { id: 2, type: 'circle', pos: 'r1-c7', guests: ["Brown Deta", "Hackett Noel", "Hackett Olivien", "Henry Walcott", "Hibbert Melvina", "Lewis George", "Lynch Sofia", "Mcleod Eva", "Reid Dexter", "Reid Shirley"] },
-            { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Broomes Juann", "Brown Charmaine", "Brown Errol", "Hackett Ann-Marie", "Hackette Daunte", "Hackett Radcliffe", "Roban Victor", "Hackett Vianne"] },
-            { id: 4, type: 'circle', pos: 'r1-c6', guests: ["Graham Diana", "Graham Paul", "Johnson Delroy", "Johnson June", "Reynolds Pauline", "Reynolds Roberts", "Severin Barbara", "Williams Bill", "Williams Janet"] },
-            { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Hurlock Winston", "Treleven Marva", "Edwards Marvel", "Wisdom Sandra"] },
-            { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blagrove Carol", "Blagrove Maurice", "Byfield Althea", "Byfield Devon", "Green Dawn", "Green Howard", "Mitchell Dion", "Mitchell Kedisha", "Rose Althea", "Rose Denrick"] },
-            { id: 7, type: 'circle', pos: 'r2-c3', guests: ["Baptiste Delores", "Coppin Chileta", "Goodridge Angela", "Jackson Marcia", "Levy Ann Marie", "Levy Loyton", "Lewis Edward", "Mckoy Paulette", "Pitters Yvette", "Rattray Valerie"] },
-            { id: 8, type: 'circle', pos: 'r1-c3', guests: ["Blair Dwayne", "Blair Patricia", "Butler Leroy", "Butler Wendy", "Douglas Gary", "Douglas Priscilla", "Ricketts Chase", "Ricketts Melonie", "Rose Andrew", "Rose Brenda"] },
-            { id: 9, type: 'circle', pos: 'r2-c2', guests: ["Anderson Nicole", "Anderson Ralston", "Griffith Ann-Marie", "Griffith Marlon", "Hunte Leroy", "Hunte Maureen", "Smith Alicia", "Smith Gary", "Spence Ezekiel", "Spence Lincoln"] },
-            { id: 10, type: 'circle', pos: 'r1-c2', guests: ["Clemeston Doreen", "Clemeston Michelle", "Comrie Clive", "Duncan Clarence", "Duncan Lydia", "James Loraine", "Lorray Elizabeth", "Smith Desline", "Walsh Clifford"] },
-            { id: 11, type: 'circle', pos: 'r2-c1', guests: ["Barrett Kingsley", "Barrett Lillian", "Dawns Dawn", "Ford Donna", "Lambert Sherril", "Marcia Clarke", "Peart Angie", "Peart Percy", "Williams Pauline", "Graham David"] },
-            { id: 12, type: 'circle', pos: 'r1-c1', guests: ["Clemeston Kristine", "Clemeston Nazheme", "Gordon Janet", "Gordon Leroy", "Johnson Cara", "Longmore Daniel", "Lorray Sarah", "Williams Emma", "Peart Marc"] },
-            { id: 13, type: 'rect', pos: 'r3-c7', guests: ["Brown Laurie Ann", "Brown Vanessa", "Hibbert  Mark", "Hibbert Maquieta", "James Aria", "James Desmond", "James Jayna", "James Natasha", "Sargeant Omari", "Sargeant Deborah"] },
-            { id: 14, type: 'circle', pos: 'r4-c7', guests: ["Davis Cherell", "Davis Robert", "Foster Goldwyn", "Foster Jason", "Foster Shimyka", "Hibbert John Jr.", "Maxwell Noreen", "Newell Simone", "Reid Judeth"] },
-            { id: 15, type: 'circle', pos: 'r3-c6', guests: ["Foster Justin", "Fraser Jalesa", "Fraser Jason", "Gordon Brandi", "Hackett Felicia", "Manhertz Brittney", "Manhertz Michael", "Robinson Bethany", "Robinson Mathurin", "Wisdom Corey"] },
-            { id: 16, type: 'circle', pos: 'r4-c6', guests: ["Anderson Brittanya", "Anderson Keana", "Lynch Josiah", "Lynch Samantha", "Mushett Andrew", "Foster Jaida", "James Darius", "Lake Toriyah", "Wesley Jada"] },
-            { id: 17, type: 'circle', pos: 'r3-c4', guests: ["Blackstock Denton", "Blackstock Venise", "Bryan Leonard", "Bryan Petronah", "Cousins Christine", "Cousins Marcel", "Guthrie Barbara", "Maxwell Kenneth", "McLaughlin Ivy", "McLaughlin Sonia"] },
-            { id: 18, type: 'circle', pos: 'r4-c4', guests: ["Antonette Scott", "Dalton Scott", "Dixon Donovan", "Kelly Ian", "Kelly Nicole", "Lee Peter", "Soprano Scott", "Thompson Charmaine", "Wallace Shawn", "Young-Dixon Sanja"] },
-            { id: 19, type: 'circle', pos: 'r3-c3', guests: ["Bennett Ricardo", "Cubitt Mark", "Cubitt Michelle", "Hall Kerryann", "Hall Michael", "Halstead Kirk", "Halstead Nadine", "St. Louis Anthony", "St. Louis Michelle", "Wallace-Bennett Lisa"] },
-            { id: 20, type: 'circle', pos: 'r4-c3', guests: ["Anderson Tanesha", "Bell Angélique", "Comrie Allison", "Comrie Sherry", "Duff Christopher", "Duff Stephaine", "Graham Latoya", "Lake Nathania", "Treleven Susie"] },
-            { id: 21, type: 'circle', pos: 'r3-c2', guests: ["Ann Marie Thompson", "Edwards-Ledger Athene", "George Tashieka", "Jameson Vernessa", "Ledger Jeffrey", "McKoy Audley", "McKoy Geisell", "McKoy Ramona", "Rodney Roxan", "Winsome Wesley"] },
-            { id: 22, type: 'circle', pos: 'r4-c2', guests: ["Clarke Ronjay", "Clarke Sashane", "Gordon Shari", "Laws Jonathan", "Lynch Marseeniah", "Lynch Shannon", "Olivierre Kelton", "Olivierre Sigrid", "Solomon Caitlyn", "Solomon Shannel"] },
-            { id: 23, type: 'circle', pos: 'r3-c1', guests: ["Byfield Nathaniel", "Byfield Rennae", "Chambers Mattrill", "Beckford Antonette", "Cole Keaton", "Nichols Joanna", "Nichols O'Brian", "Rose Ricardo", "Rose Alicia", "Severin David"] },
-            { id: 24, type: 'circle', pos: 'r4-c1', guests: ["Clarke Adriel", "Clarke Yahsmine", "Douglas Diondra", "Guthrie Aliyah", "Kayla McLean", "Lake Yosephine", "Cousins Christopher", "Cousins Lydia", "Cousins Samantha", "Phillip McLean"] }
-        ];
+                { id: 1, type: 'rect', pos: 'r2-c7', guests: ["Brown Claud", "Edwards Gervan", "Edwards Marlene", "Ford Claudeth", "Linton Josephine", "Linton-Brown Jean", "Saunders Cynthia"] },
+                { id: 2, type: 'circle', pos: 'r1-c7', guests: ["Brown Deta", "Hackett Noel", "Hackett Olivien", "Henry Walcott", "Hibbert Melvina", "Lewis George", "Lynch Sofia", "Mcleod Eva", "Reid Dexter", "Reid Shirley"] },
+                { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Broomes Juann", "Brown Charmaine", "Brown Errol", "Hackett Ann-Marie", "Hackette Daunte", "Hackett Radcliffe", "Roban Victor", "Hackett Vianne"] },
+                { id: 4, type: 'circle', pos: 'r1-c6', guests: ["Graham Diana", "Graham Paul", "Johnson Delroy", "Johnson June", "Reynolds Pauline", "Reynolds Roberts", "Severin Barbara", "Williams Bill", "Williams Janet"] },
+                { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Hurlock Winston", "Treleven Marva", "Edwards Marvel", "Wisdom Sandra"] },
+                { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blagrove Carol", "Blagrove Maurice", "Byfield Althea", "Byfield Devon", "Green Dawn", "Green Howard", "Mitchell Dion", "Mitchell Kedisha", "Rose Althea", "Rose Denrick"] },
+                { id: 7, type: 'circle', pos: 'r2-c3', guests: ["Baptiste Delores", "Coppin Chileta", "Goodridge Angela", "Jackson Marcia", "Levy Ann Marie", "Levy Loyton", "Lewis Edward", "Mckoy Paulette", "Pitters Yvette", "Rattray Valerie"] },
+                { id: 8, type: 'circle', pos: 'r1-c3', guests: ["Blair Dwayne", "Blair Patricia", "Butler Leroy", "Butler Wendy", "Douglas Gary", "Douglas Priscilla", "Ricketts Chase", "Ricketts Melonie", "Rose Andrew", "Rose Brenda"] },
+                { id: 9, type: 'circle', pos: 'r2-c2', guests: ["Anderson Nicole", "Anderson Ralston", "Griffith Ann-Marie", "Griffith Marlon", "Hunte Leroy", "Hunte Maureen", "Smith Alicia", "Smith Gary", "Spence Ezekiel", "Spence Lincoln"] },
+                { id: 10, type: 'circle', pos: 'r1-c2', guests: ["Clemeston Doreen", "Clemeston Michelle", "Comrie Clive", "Duncan Clarence", "Duncan Lydia", "James Loraine", "Lorray Elizabeth", "Smith Desline", "Walsh Clifford"] },
+                { id: 11, type: 'circle', pos: 'r2-c1', guests: ["Barrett Kingsley", "Barrett Lillian", "Dawns Dawn", "Ford Donna", "Lambert Sherril", "Marcia Clarke", "Peart Angie", "Peart Percy", "Williams Pauline", "Graham David"] },
+                { id: 12, type: 'circle', pos: 'r1-c1', guests: ["Clemeston Kristine", "Clemeston Nazheme", "Gordon Janet", "Gordon Leroy", "Johnson Cara", "Longmore Daniel", "Lorray Sarah", "Williams Emma", "Peart Marc"] },
+                { id: 13, type: 'rect', pos: 'r3-c7', guests: ["Brown Laurie Ann", "Brown Vanessa", "Hibbert  Mark", "Hibbert Maquieta", "James Aria", "James Desmond", "James Jayna", "James Natasha", "Sargeant Omari", "Sargeant Deborah"] },
+                { id: 14, type: 'circle', pos: 'r4-c7', guests: ["Davis Cherell", "Davis Robert", "Foster Goldwyn", "Foster Jason", "Foster Shimyka", "Hibbert John Jr.", "Maxwell Noreen", "Newell Simone", "Reid Judeth"] },
+                { id: 15, type: 'circle', pos: 'r3-c6', guests: ["Foster Justin", "Fraser Jalesa", "Fraser Jason", "Gordon Brandi", "Hackett Felicia", "Manhertz Brittney", "Manhertz Michael", "Robinson Bethany", "Robinson Mathurin", "Wisdom Corey"] },
+                { id: 16, type: 'circle', pos: 'r4-c6', guests: ["Anderson Brittanya", "Anderson Keana", "Lynch Josiah", "Lynch Samantha", "Mushett Andrew", "Foster Jaida", "James Darius", "Lake Toriyah", "Wesley Jada"] },
+                { id: 17, type: 'circle', pos: 'r3-c4', guests: ["Blackstock Denton", "Blackstock Venise", "Bryan Leonard", "Bryan Petronah", "Cousins Christine", "Cousins Marcel", "Guthrie Barbara", "Maxwell Kenneth", "McLaughlin Ivy", "McLaughlin Sonia"] },
+                { id: 18, type: 'circle', pos: 'r4-c4', guests: ["Antonette Scott", "Dalton Scott", "Dixon Donovan", "Kelly Ian", "Kelly Nicole", "Lee Peter", "Soprano Scott", "Thompson Charmaine", "Wallace Shawn", "Young-Dixon Sanja"] },
+                { id: 19, type: 'circle', pos: 'r3-c3', guests: ["Bennett Ricardo", "Cubitt Mark", "Cubitt Michelle", "Hall Kerryann", "Hall Michael", "Halstead Kirk", "Halstead Nadine", "St. Louis Anthony", "St. Louis Michelle", "Wallace-Bennett Lisa"] },
+                { id: 20, type: 'circle', pos: 'r4-c3', guests: ["Anderson Tanesha", "Bell Angélique", "Comrie Allison", "Comrie Sherry", "Duff Christopher", "Duff Stephaine", "Graham Latoya", "Lake Nathania", "Treleven Susie"] },
+                { id: 21, type: 'circle', pos: 'r3-c2', guests: ["Ann Marie Thompson", "Edwards-Ledger Athene", "George Tashieka", "Jameson Vernessa", "Ledger Jeffrey", "McKoy Audley", "McKoy Geisell", "McKoy Ramona", "Rodney Roxan", "Winsome Wesley"] },
+                { id: 22, type: 'circle', pos: 'r4-c2', guests: ["Clarke Ronjay", "Clarke Sashane", "Gordon Shari", "Laws Jonathan", "Lynch Marseeniah", "Lynch Shannon", "Olivierre Kelton", "Olivierre Sigrid", "Solomon Caitlyn", "Solomon Shannel"] },
+                { id: 23, type: 'circle', pos: 'r3-c1', guests: ["Byfield Nathaniel", "Byfield Rennae", "Chambers Mattrill", "Beckford Antonette", "Cole Keaton", "Nichols Joanna", "Nichols O'Brian", "Rose Ricardo", "Rose Alicia", "Severin David"] },
+                { id: 24, type: 'circle', pos: 'r4-c1', guests: ["Clarke Adriel", "Clarke Yahsmine", "Douglas Diondra", "Guthrie Aliyah", "Kayla McLean", "Lake Yosephine", "Cousins Christopher", "Cousins Lydia", "Cousins Samantha", "Phillip McLean"] }
+            ];
 
-        // --- DOM references ---
-        const floorPlan = document.getElementById('floorPlan');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalContent = document.getElementById('modalContent');
-        const searchInput = document.getElementById('searchInput');
-        const searchResults = document.getElementById('searchResults');
-        const btnMap = document.getElementById('btnMap');
-        const btnList = document.getElementById('btnList');
-        const mapView = document.getElementById('mapView');
-        const listView = document.getElementById('listView');
+            // --- DOM references ---
+            const floorPlan = document.getElementById('floorPlan');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalContent = document.getElementById('modalContent');
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            const btnMap = document.getElementById('btnMap');
+            const btnList = document.getElementById('btnList');
+            const mapView = document.getElementById('mapView');
+            const listView = document.getElementById('listView');
 
-        let currentHighlightTimeout = null;
-        let resizeTimeout = null;
+            let currentHighlightTimeout = null;
+            let resizeTimeout = null;
 
-        // --- Grid mapping (16 columns) ---
-        const posMapDesktop = {
-            'r1-c1': 'grid-area: 2 / 2 / 4 / 4;', 'r1-c2': 'grid-area: 2 / 4 / 4 / 6;', 'r1-c3': 'grid-area: 2 / 6 / 4 / 8;', 'r1-c4': 'grid-area: 2 / 8 / 4 / 10;',
-            'r1-c6': 'grid-area: 2 / 11 / 4 / 13;', 'r1-c7': 'grid-area: 2 / 13 / 4 / 15;',
-            'r2-c1': 'grid-area: 5 / 2 / 7 / 4;', 'r2-c2': 'grid-area: 5 / 4 / 7 / 6;', 'r2-c3': 'grid-area: 5 / 6 / 7 / 8;', 'r2-c4': 'grid-area: 5 / 8 / 7 / 10;',
-            'r2-c6': 'grid-area: 5 / 11 / 7 / 13;', 'r2-c7': 'grid-area: 5 / 13 / 7 / 15;',
-            'r3-c1': 'grid-area: 9 / 2 / 11 / 4;', 'r3-c2': 'grid-area: 9 / 4 / 11 / 6;', 'r3-c3': 'grid-area: 9 / 6 / 11 / 8;', 'r3-c4': 'grid-area: 9 / 8 / 11 / 10;',
-            'r3-c6': 'grid-area: 9 / 11 / 11 / 13;', 'r3-c7': 'grid-area: 9 / 13 / 11 / 15;',
-            'r4-c1': 'grid-area: 12 / 2 / 14 / 4;', 'r4-c2': 'grid-area: 12 / 4 / 14 / 6;', 'r4-c3': 'grid-area: 12 / 6 / 14 / 8;', 'r4-c4': 'grid-area: 12 / 8 / 14 / 10;',
-            'r4-c6': 'grid-area: 12 / 11 / 14 / 13;', 'r4-c7': 'grid-area: 12 / 13 / 14 / 15;',
-        };
+            // --- Grid mapping (16 columns) ---
+            const posMapDesktop = {
+                'r1-c1': 'grid-area: 2 / 2 / 4 / 4;', 'r1-c2': 'grid-area: 2 / 4 / 4 / 6;', 'r1-c3': 'grid-area: 2 / 6 / 4 / 8;', 'r1-c4': 'grid-area: 2 / 8 / 4 / 10;',
+                'r1-c6': 'grid-area: 2 / 11 / 4 / 13;', 'r1-c7': 'grid-area: 2 / 13 / 4 / 15;',
+                'r2-c1': 'grid-area: 5 / 2 / 7 / 4;', 'r2-c2': 'grid-area: 5 / 4 / 7 / 6;', 'r2-c3': 'grid-area: 5 / 6 / 7 / 8;', 'r2-c4': 'grid-area: 5 / 8 / 7 / 10;',
+                'r2-c6': 'grid-area: 5 / 11 / 7 / 13;', 'r2-c7': 'grid-area: 5 / 13 / 7 / 15;',
+                'r3-c1': 'grid-area: 9 / 2 / 11 / 4;', 'r3-c2': 'grid-area: 9 / 4 / 11 / 6;', 'r3-c3': 'grid-area: 9 / 6 / 11 / 8;', 'r3-c4': 'grid-area: 9 / 8 / 11 / 10;',
+                'r3-c6': 'grid-area: 9 / 11 / 11 / 13;', 'r3-c7': 'grid-area: 9 / 13 / 11 / 15;',
+                'r4-c1': 'grid-area: 12 / 2 / 14 / 4;', 'r4-c2': 'grid-area: 12 / 4 / 14 / 6;', 'r4-c3': 'grid-area: 12 / 6 / 14 / 8;', 'r4-c4': 'grid-area: 12 / 8 / 14 / 10;',
+                'r4-c6': 'grid-area: 12 / 11 / 14 / 13;', 'r4-c7': 'grid-area: 12 / 13 / 14 / 15;',
+            };
 
-        const posMapMobile = {
-            'r1-c1': 'grid-area: 2 / 2 / 4 / 4;', 'r1-c2': 'grid-area: 2 / 4 / 4 / 6;', 'r1-c3': 'grid-area: 2 / 6 / 4 / 8;', 'r1-c4': 'grid-area: 2 / 8 / 4 / 10;',
-            'r1-c6': 'grid-area: 2 / 11 / 4 / 13;', 'r1-c7': 'grid-area: 2 / 13 / 4 / 15;',
-            'r2-c1': 'grid-area: 4 / 2 / 6 / 4;', 'r2-c2': 'grid-area: 4 / 4 / 6 / 6;', 'r2-c3': 'grid-area: 4 / 6 / 6 / 8;', 'r2-c4': 'grid-area: 4 / 8 / 6 / 10;',
-            'r2-c6': 'grid-area: 4 / 11 / 6 / 13;', 'r2-c7': 'grid-area: 4 / 13 / 6 / 15;',
-            'r3-c1': 'grid-area: 8 / 2 / 10 / 4;', 'r3-c2': 'grid-area: 8 / 4 / 10 / 6;', 'r3-c3': 'grid-area: 8 / 6 / 10 / 8;', 'r3-c4': 'grid-area: 8 / 8 / 10 / 10;',
-            'r3-c6': 'grid-area: 8 / 11 / 10 / 13;', 'r3-c7': 'grid-area: 8 / 13 / 10 / 15;',
-            'r4-c1': 'grid-area: 10 / 2 / 12 / 4;', 'r4-c2': 'grid-area: 10 / 4 / 12 / 6;', 'r4-c3': 'grid-area: 10 / 6 / 12 / 8;', 'r4-c4': 'grid-area: 10 / 8 / 12 / 10;',
-            'r4-c6': 'grid-area: 10 / 11 / 12 / 13;', 'r4-c7': 'grid-area: 10 / 13 / 12 / 15;',
-        };
+            const posMapMobile = {
+                'r1-c1': 'grid-area: 2 / 2 / 4 / 4;', 'r1-c2': 'grid-area: 2 / 4 / 4 / 6;', 'r1-c3': 'grid-area: 2 / 6 / 4 / 8;', 'r1-c4': 'grid-area: 2 / 8 / 4 / 10;',
+                'r1-c6': 'grid-area: 2 / 11 / 4 / 13;', 'r1-c7': 'grid-area: 2 / 13 / 4 / 15;',
+                'r2-c1': 'grid-area: 4 / 2 / 6 / 4;', 'r2-c2': 'grid-area: 4 / 4 / 6 / 6;', 'r2-c3': 'grid-area: 4 / 6 / 6 / 8;', 'r2-c4': 'grid-area: 4 / 8 / 6 / 10;',
+                'r2-c6': 'grid-area: 4 / 11 / 6 / 13;', 'r2-c7': 'grid-area: 4 / 13 / 6 / 15;',
+                'r3-c1': 'grid-area: 8 / 2 / 10 / 4;', 'r3-c2': 'grid-area: 8 / 4 / 10 / 6;', 'r3-c3': 'grid-area: 8 / 6 / 10 / 8;', 'r3-c4': 'grid-area: 8 / 8 / 10 / 10;',
+                'r3-c6': 'grid-area: 8 / 11 / 10 / 13;', 'r3-c7': 'grid-area: 8 / 13 / 10 / 15;',
+                'r4-c1': 'grid-area: 10 / 2 / 12 / 4;', 'r4-c2': 'grid-area: 10 / 4 / 12 / 6;', 'r4-c3': 'grid-area: 10 / 6 / 12 / 8;', 'r4-c4': 'grid-area: 10 / 8 / 12 / 10;',
+                'r4-c6': 'grid-area: 10 / 11 / 12 / 13;', 'r4-c7': 'grid-area: 10 / 13 / 12 / 15;',
+            };
 
-        function getLayoutConfig() {
-            const isMobile = window.innerWidth <= 768;
-            const ZINC_700 = '#3f3f46';
-            const ZINC_600 = '#52525b';
-            const ZINC_200 = '#d4d4d8';
-            const ZINC_400 = '#a1a1aa';
-            const PURPLE_400 = '#c084fc';
+            function getLayoutConfig()
+            {
+                const isMobile = window.innerWidth <= 768;
+                const ZINC_700 = '#3f3f46';
+                const ZINC_600 = '#52525b';
+                const ZINC_200 = '#d4d4d8';
+                const ZINC_400 = '#a1a1aa';
+                const PURPLE_400 = '#c084fc';
 
-            const config = {};
+                const config = {};
 
-            if (isMobile) {
-                config.posMap = posMapMobile;
-                config.htStyle = 'grid-area: 4 / 15 / 10 / 16; writing-mode: vertical-rl;';
+                if(isMobile) {
+                    config.posMap = posMapMobile;
+                    config.htStyle = 'grid-area: 4 / 15 / 10 / 16; writing-mode: vertical-rl;';
 
-                config.staticElements = [
-                    { name: 'Buffet', style: `grid-area: 1 / 3 / 2 / 9; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
-                    { name: 'Foyer', style: `grid-area: 11 / 9 / 16 / 16; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
-                    { name: 'Bar', style: `grid-area: 12 / 4 / 13 / 9; margin-bottom: 8px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
-                    { name: 'Reception', style: `grid-area: 13 / 4 / 14 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
-                    { name: 'Entrance', style: `grid-area: 15 / 1 / 16 / 8; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
-                    { name: 'Foyer Entrance', style: `grid-area: 15 / 11 / 16 / 18; background: #27272a; color: white; border: 1px solid ${PURPLE_400}; text-align: center;` },
-                ];
-            } else {
-                config.posMap = posMapDesktop;
-                config.htStyle = 'grid-area: 5 / 15 / 11 / 16; writing-mode: vertical-rl;';
+                    config.staticElements = [
+                        { name: 'Buffet', style: `grid-area: 1 / 3 / 2 / 9; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
+                        { name: 'Foyer', style: `grid-area: 11 / 9 / 16 / 16; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
+                        { name: 'Bar', style: `grid-area: 12 / 4 / 13 / 9; margin-bottom: 8px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
+                        { name: 'Reception', style: `grid-area: 13 / 4 / 14 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
+                        { name: 'Entrance', style: `grid-area: 15 / 1 / 16 / 8; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
+                        { name: 'Foyer Entrance', style: `grid-area: 15 / 11 / 16 / 18; background: #27272a; color: white; border: 1px solid ${PURPLE_400}; text-align: center;` },
+                    ];
+                } else {
+                    config.posMap = posMapDesktop;
+                    config.htStyle = 'grid-area: 5 / 15 / 11 / 16; writing-mode: vertical-rl;';
 
-                config.staticElements = [
-                    { name: 'Buffet', style: `grid-area: 1 / 3 / 2 / 9; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
-                    { name: 'Bar', style: `grid-area: 15 / 4 / 16 / 9; margin-top: 10px; margin-bottom: 10px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
-                    { name: 'Reception', style: `grid-area: 16 / 4 / 17 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
-                    { name: 'Foyer', style: `grid-area: 15 / 9 / 16 / 16; margin-top: 8px; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
-                    { name: 'Entrance', style: `grid-area: 17 / 2 / 18 / 9; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
-                    { name: 'Foyer Entrance', style: `grid-area: 17 / 9 / 18 / 15; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
-                ];
+                    config.staticElements = [
+                        { name: 'Buffet', style: `grid-area: 1 / 3 / 2 / 9; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
+                        { name: 'Bar', style: `grid-area: 15 / 4 / 16 / 9; margin-top: 10px; margin-bottom: 10px; background-color: ${ZINC_700}; color: ${ZINC_200}; border: 2px solid ${ZINC_600};` },
+                        { name: 'Reception', style: `grid-area: 16 / 4 / 17 / 9; margin-top: 4px; height: 15px; font-size: 0.6rem; background-color: transparent; color: ${ZINC_400}; border: 1px solid ${ZINC_400};` },
+                        { name: 'Foyer', style: `grid-area: 15 / 9 / 16 / 16; margin-top: 8px; margin-bottom: 12px; width: 80%; justify-self: center; background-color: transparent; color: ${ZINC_200}; font-size: 1rem;` },
+                        { name: 'Entrance', style: `grid-area: 17 / 2 / 18 / 9; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
+                        { name: 'Foyer Entrance', style: `grid-area: 17 / 9 / 18 / 15; background: #27272a; color: white; border: 1px solid ${PURPLE_400};` },
+                    ];
+                }
+
+                return config;
             }
 
-            return config;
-        }
+            function renderMap()
+            {
+                floorPlan.innerHTML = '';
+                const { posMap, staticElements, htStyle } = getLayoutConfig();
 
-        function renderMap() {
-            floorPlan.innerHTML = '';
-            const { posMap, staticElements, htStyle } = getLayoutConfig();
+                // Static floor elements
+                staticElements.forEach(el =>
+                {
+                    const div = document.createElement('div');
+                    div.className = 'floor-area shadow-sm rounded';
+                    div.style.cssText = el.style;
+                    div.innerText = el.name;
+                    floorPlan.appendChild(div);
+                });
 
-            // Static floor elements
-            staticElements.forEach(el => {
-                const div = document.createElement('div');
-                div.className = 'floor-area shadow-sm rounded';
-                div.style.cssText = el.style;
-                div.innerText = el.name;
-                floorPlan.appendChild(div);
-            });
+                // Tables
+                tablesData.forEach(table =>
+                {
+                    const el = document.createElement('div');
+                    el.dataset.id = table.id;
+                    el.addEventListener('click', () => openModal(table));
 
-            // Tables
-            tablesData.forEach(table => {
-                const el = document.createElement('div');
-                el.dataset.id = table.id;
-                el.addEventListener('click', () => openModal(table));
-
-                if (table.id === 'HT') {
-                    el.className = 'table-rect bg-purple-800 border-2 border-amber-400 text-amber-400 font-bold text-base shadow-lg cursor-pointer hover:border-amber-300 hover:bg-purple-700';
-                    el.style.cssText = htStyle;
-                    el.style.width = '100%';
-                    el.style.height = '100%';
-                    el.innerText = table.label;
-                    floorPlan.appendChild(el);
-                    return;
-                }
-
-                if (table.type === 'circle') {
-                    el.className = 'table-circle bg-zinc-800 border-2 border-zinc-700 text-amber-400 font-bold text-lg shadow-md cursor-pointer hover:border-amber-500 hover:text-amber-300';
-                } else {
-                    el.className = 'table-rect bg-zinc-800 border-2 border-zinc-700 text-amber-400 font-bold text-lg shadow-md cursor-pointer hover:border-amber-500 hover:text-amber-300';
-                    el.style.width = '100%';
-                    if (window.innerWidth > 768) {
-                        el.style.height = '60%';
+                    if(table.id === 'HT') {
+                        el.className = 'table-rect bg-purple-800 border-2 border-amber-400 text-amber-400 font-bold text-base shadow-lg cursor-pointer hover:border-amber-300 hover:bg-purple-700';
+                        el.style.cssText = htStyle;
+                        el.style.width = '100%';
+                        el.style.height = '100%';
+                        el.innerText = table.label;
+                        floorPlan.appendChild(el);
+                        return;
                     }
-                }
 
-                if (posMap[table.pos]) {
-                    el.style.cssText += posMap[table.pos];
-                    el.innerText = table.label ? table.label : table.id;
-                    floorPlan.appendChild(el);
-                }
-            });
-        }
+                    if(table.type === 'circle') {
+                        el.className = 'table-circle bg-zinc-800 border-2 border-zinc-700 text-amber-400 font-bold text-lg shadow-md cursor-pointer hover:border-amber-500 hover:text-amber-300';
+                    } else {
+                        el.className = 'table-rect bg-zinc-800 border-2 border-zinc-700 text-amber-400 font-bold text-lg shadow-md cursor-pointer hover:border-amber-500 hover:text-amber-300';
+                        el.style.width = '100%';
+                        if(window.innerWidth > 768) {
+                            el.style.height = '60%';
+                        }
+                    }
 
-        function renderListView() {
-            const container = document.getElementById('listContainer');
-            container.innerHTML = '';
+                    if(posMap[table.pos]) {
+                        el.style.cssText += posMap[table.pos];
+                        el.innerText = table.label ? table.label : table.id;
+                        floorPlan.appendChild(el);
+                    }
+                });
+            }
 
-            tablesData
-                .slice()
-                .sort((a, b) => {
-                    if (a.id === 'HT') return -1;
-                    if (b.id === 'HT') return 1;
-                    return a.id - b.id;
-                })
-                .forEach(table => {
-                    const card = document.createElement('div');
-                    card.className =
-                        'bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:bg-zinc-800 transition-colors cursor-pointer';
-                    card.innerHTML = `
+            function renderListView()
+            {
+                const container = document.getElementById('listContainer');
+                container.innerHTML = '';
+
+                tablesData
+                    .slice()
+                    .sort((a, b) =>
+                    {
+                        if(a.id === 'HT') return -1;
+                        if(b.id === 'HT') return 1;
+                        return a.id - b.id;
+                    })
+                    .forEach(table =>
+                    {
+                        const card = document.createElement('div');
+                        card.className =
+                            'bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:bg-zinc-800 transition-colors cursor-pointer';
+                        card.innerHTML = `
               <div class="flex justify-between items-center mb-2">
                 <span class="font-bold text-lg text-amber-400">${table.label || 'Table ' + table.id
-                        }</span>
+                            }</span>
                 <span class="text-xs text-zinc-400 bg-zinc-800 px-2 py-1 rounded-full">${table.guests.length
-                        } Guests</span>
+                            } Guests</span>
               </div>
               <p class="text-sm text-zinc-400 truncate">${table.guests.join(', ')}</p>
             `;
-                    card.addEventListener('click', () => openModal(table));
-                    container.appendChild(card);
-                });
-        }
+                        card.addEventListener('click', () => openModal(table));
+                        container.appendChild(card);
+                    });
+            }
 
-        function openModal(table) {
-            document.getElementById('modalTitle').innerText =
-                table.label || `Table ${table.id}`;
-            const list = document.getElementById('modalGuestList');
-            list.innerHTML = '';
+            function openModal(table)
+            {
+                document.getElementById('modalTitle').innerText =
+                    table.label || `Table ${table.id}`;
+                const list = document.getElementById('modalGuestList');
+                list.innerHTML = '';
 
-            table.guests.forEach(guest => {
-                const li = document.createElement('li');
-                li.className =
-                    'flex items-center space-x-3 py-2 border-b border-zinc-800 last:border-0';
-                li.innerHTML = `
+                table.guests.forEach(guest =>
+                {
+                    const li = document.createElement('li');
+                    li.className =
+                        'flex items-center space-x-3 py-2 border-b border-zinc-800 last:border-0';
+                    li.innerHTML = `
             <div class="w-8 h-8 rounded-full bg-amber-900/40 flex items-center justify-center text-amber-400 font-bold text-xs">
               ${guest.charAt(0)}
             </div>
             <span class="text-zinc-200 font-medium">${guest}</span>
           `;
-                list.appendChild(li);
-            });
+                    list.appendChild(li);
+                });
 
-            // Lock background scroll
-            document.body.style.overflow = 'hidden';
+                // Lock background scroll
+                document.body.style.overflow = 'hidden';
 
-            modalOverlay.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                modalOverlay.classList.remove('opacity-0');
-                modalContent.classList.remove('translate-y-full');
-            });
-        }
-
-        function closeModalFn() {
-            modalOverlay.classList.add('opacity-0');
-            modalContent.classList.add('translate-y-full');
-
-            setTimeout(() => {
-                modalOverlay.classList.add('hidden');
-                // Restore background scroll
-                document.body.style.overflow = '';
-            }, 300);
-        }
-
-        function switchView(view) {
-            if (view === 'map') {
-                mapView.classList.remove('hidden');
-                listView.classList.add('hidden');
-                btnMap.className =
-                    'px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors';
-                btnList.className =
-                    'px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700';
-            } else {
-                mapView.classList.add('hidden');
-                listView.classList.remove('hidden');
-                btnMap.className =
-                    'px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700';
-                btnList.className =
-                    'px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors';
-                renderListView();
-            }
-        }
-
-        function centerTableInView(tableElement) {
-            const container = mapView;
-            const rect = tableElement.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-
-            const offsetTop =
-                rect.top -
-                containerRect.top -
-                container.clientHeight / 2 +
-                rect.height / 2;
-            const offsetLeft =
-                rect.left -
-                containerRect.left -
-                container.clientWidth / 2 +
-                rect.width / 2;
-
-            container.scrollTo({
-                top: container.scrollTop + offsetTop,
-                left: container.scrollLeft + offsetLeft,
-                behavior: 'smooth',
-            });
-        }
-
-        function highlightTable(tableId) {
-            if (currentHighlightTimeout) {
-                clearTimeout(currentHighlightTimeout);
-                currentHighlightTimeout = null;
+                modalOverlay.classList.remove('hidden');
+                requestAnimationFrame(() =>
+                {
+                    modalOverlay.classList.remove('opacity-0');
+                    modalContent.classList.remove('translate-y-full');
+                });
             }
 
-            switchView('map');
+            function closeModalFn()
+            {
+                modalOverlay.classList.add('opacity-0');
+                modalContent.classList.add('translate-y-full');
 
-            document.querySelectorAll('.highlighted').forEach(el => {
-                el.classList.remove('highlighted');
-            });
+                setTimeout(() =>
+                {
+                    modalOverlay.classList.add('hidden');
+                    // Restore background scroll
+                    document.body.style.overflow = '';
+                }, 300);
+            }
 
-            requestAnimationFrame(() => {
-                const tableElement = document.querySelector(`[data-id="${tableId}"]`);
-                const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
+            function switchView(view)
+            {
+                if(view === 'map') {
+                    mapView.classList.remove('hidden');
+                    listView.classList.add('hidden');
+                    btnMap.className =
+                        'px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors';
+                    btnList.className =
+                        'px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700';
+                } else {
+                    mapView.classList.add('hidden');
+                    listView.classList.remove('hidden');
+                    btnMap.className =
+                        'px-4 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full text-xs font-bold shadow-sm transition-colors hover:bg-zinc-700';
+                    btnList.className =
+                        'px-4 py-1 bg-purple-600 text-white rounded-full text-xs font-bold shadow-md transition-colors';
+                    renderListView();
+                }
+            }
 
-                if (!tableElement || !tableData) return;
+            function centerTableInView(tableElement)
+            {
+                const container = mapView;
+                const rect = tableElement.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
 
-                // FRAME 1 → scroll only
-                // centerTableInView(tableElement);
-                tableElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                const offsetTop =
+                    rect.top -
+                    containerRect.top -
+                    container.clientHeight / 2 +
+                    rect.height / 2;
+                const offsetLeft =
+                    rect.left -
+                    containerRect.left -
+                    container.clientWidth / 2 +
+                    rect.width / 2;
 
-                // allow scroll motion to settle BEFORE animation
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
+                container.scrollTo({
+                    top: container.scrollTop + offsetTop,
+                    left: container.scrollLeft + offsetLeft,
+                    behavior: 'smooth',
+                });
+            }
 
-                        // reset state
-                        tableElement.classList.remove('highlighted');
-                        void tableElement.offsetWidth; // force reflow
+            function highlightTable(tableId)
+            {
+                if(currentHighlightTimeout) {
+                    clearTimeout(currentHighlightTimeout);
+                    currentHighlightTimeout = null;
+                }
 
-                        // FRAME 4 → start blinking animation
-                        tableElement.classList.add('highlighted');
-                        const blinkAnimation = tableElement.getAnimations().filter(anim => anim.animationName === "blink-android-safe").pop();
-                        if(!blinkAnimation) {
-                            console.warn('No blink animation found on table element:', tableElement);
-                            return;
-                        }
-                        blinkAnimation.onfinish = () => {
+                switchView('map');
+
+                document.querySelectorAll('.highlighted').forEach(el =>
+                {
+                    el.classList.remove('highlighted');
+                });
+
+                requestAnimationFrame(() =>
+                {
+                    const tableElement = document.querySelector(`[data-id="${tableId}"]`);
+                    const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
+
+                    if(!tableElement || !tableData) return;
+
+                    // FRAME 1 → scroll only
+                    // centerTableInView(tableElement);
+                    tableElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+                    // allow scroll motion to settle BEFORE animation
+                    requestAnimationFrame(() =>
+                    {
+                        requestAnimationFrame(() =>
+                        {
+
+                            // reset state
                             tableElement.classList.remove('highlighted');
-                            openModal(tableData);
-                        };
+                            void tableElement.offsetWidth; // force reflow
+
+                            // FRAME 4 → start blinking animation
+                            tableElement.classList.add('highlighted');
+                            const blinkAnimation = tableElement.getAnimations().filter(anim => anim.animationName === "blink-android-safe").pop();
+                            if(!blinkAnimation) {
+                                console.warn('No blink animation found on table element:', tableElement);
+                                return;
+                            }
+                            blinkAnimation.onfinish = () =>
+                            {
+                                tableElement.classList.remove('highlighted');
+                                openModal(tableData);
+                            };
+                        });
                     });
                 });
-            });
-        }
-
-
-        function handleSearch(e) {
-            const term = e.target.value.toLowerCase();
-            searchResults.innerHTML = '';
-
-            if (term.length < 2) {
-                searchResults.classList.add('hidden');
-                return;
             }
 
-            const results = [];
-            tablesData.forEach(table => {
-                table.guests.forEach(guest => {
-                    if (guest.toLowerCase().includes(term)) {
-                        results.push({ guest, table });
-                    }
-                });
-            });
 
-            if (results.length > 0) {
-                searchResults.classList.remove('hidden');
-                results.forEach(res => {
-                    const div = document.createElement('div');
-                    div.className =
-                        'px-4 py-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-900 last:border-0';
-                    div.innerHTML = `
+            function handleSearch(e)
+            {
+                const term = e.target.value.toLowerCase();
+                searchResults.innerHTML = '';
+
+                if(term.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+
+                const results = [];
+                tablesData.forEach(table =>
+                {
+                    table.guests.forEach(guest =>
+                    {
+                        if(guest.toLowerCase().includes(term)) {
+                            results.push({ guest, table });
+                        }
+                    });
+                });
+
+                if(results.length > 0) {
+                    searchResults.classList.remove('hidden');
+                    results.forEach(res =>
+                    {
+                        const div = document.createElement('div');
+                        div.className =
+                            'px-4 py-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-900 last:border-0';
+                        div.innerHTML = `
               <div class="font-medium text-zinc-100">${res.guest}</div>
               <div class="text-xs text-amber-400 font-bold">${res.table.label || 'Table ' + res.table.id
-                        }</div>
+                            }</div>
             `;
-                    div.addEventListener('click', () => {
-                        highlightTable(res.table.id);
-                        searchResults.classList.add('hidden');
-                        searchInput.value = '';
+                        div.addEventListener('click', () =>
+                        {
+                            highlightTable(res.table.id);
+                            searchResults.classList.add('hidden');
+                            searchInput.value = '';
+                        });
+                        searchResults.appendChild(div);
                     });
-                    searchResults.appendChild(div);
-                });
-            } else {
-                const noResult = document.createElement('div');
-                noResult.className = 'px-4 py-3 text-sm text-zinc-500 italic';
-                noResult.innerText = `No results found for "${term}"`;
-                searchResults.appendChild(noResult);
-                searchResults.classList.remove('hidden');
+                } else {
+                    const noResult = document.createElement('div');
+                    noResult.className = 'px-4 py-3 text-sm text-zinc-500 italic';
+                    noResult.innerText = `No results found for "${term}"`;
+                    searchResults.appendChild(noResult);
+                    searchResults.classList.remove('hidden');
+                }
             }
-        }
 
-        // Close search results on outside click
-        document.addEventListener('click', (e) => {
-            if (
-                !searchResults.contains(e.target) &&
-                e.target !== searchInput
-            ) {
-                searchResults.classList.add('hidden');
-            }
-        });
+            // Close search results on outside click
+            document.addEventListener('click', (e) =>
+            {
+                if(
+                    !searchResults.contains(e.target) &&
+                    e.target !== searchInput
+                ) {
+                    searchResults.classList.add('hidden');
+                }
+            });
 
-        // --- Event Listeners ---
-        document.getElementById('closeModal').addEventListener('click', closeModalFn);
+            // --- Event Listeners ---
+            document.getElementById('closeModal').addEventListener('click', closeModalFn);
 
-        modalOverlay.addEventListener('click', e => {
-            if (e.target === modalOverlay) closeModalFn();
-        });
+            modalOverlay.addEventListener('click', e =>
+            {
+                if(e.target === modalOverlay) closeModalFn();
+            });
 
-        searchInput.addEventListener('input', handleSearch);
-        btnMap.addEventListener('click', () => switchView('map'));
-        btnList.addEventListener('click', () => switchView('list'));
+            searchInput.addEventListener('input', handleSearch);
+            btnMap.addEventListener('click', () => switchView('map'));
+            btnList.addEventListener('click', () => switchView('list'));
 
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                renderMap();
-            }, 200);
-        });
+            window.addEventListener('resize', () =>
+            {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() =>
+                {
+                    renderMap();
+                }, 200);
+            });
 
-        // Init
-        renderMap();
-        renderListView();
-    </script>
-</body>
+            // Init
+            renderMap();
+            renderListView();
+        </script>
+    </body>
 
 </html>
