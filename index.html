@@ -43,6 +43,59 @@
         /* ANDROID-SAFE BLINKING ANIMATION (NO BOX-SHADOW) */
         /* --------------------------------------------- */
 
+        @-webkit-keyframes blink-android-safe {
+            0%,
+            55% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            56%,
+            100% {
+                opacity: 0.35;
+                transform: scale(1.1);
+            }
+        }
+        @-moz-keyframes blink-android-safe {
+            0%,
+            55% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            56%,
+            100% {
+                opacity: 0.35;
+                transform: scale(1.1);
+            }
+        }
+        @-ms-keyframes blink-android-safe {
+            0%,
+            55% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            56%,
+            100% {
+                opacity: 0.35;
+                transform: scale(1.1);
+            }
+        }
+        @-o-keyframes blink-android-safe {
+            0%,
+            55% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            56%,
+            100% {
+                opacity: 0.35;
+                transform: scale(1.1);
+            }
+        }
+
         @keyframes blink-android-safe {
             0%,
             55% {
@@ -65,8 +118,10 @@
             -moz-animation: blink-android-safe 0.7s ease-in-out 5;
             -ms-animation: blink-android-safe 0.7s ease-in-out 5;
             -o-animation: blink-android-safe 0.7s ease-in-out 5;
-            animation: blink-android-safe 0.7s ease-in-out 5;
+            animation: blink-android-safe 0.7s ease-in-out 5 !important;
             z-index: 20;
+
+            transition: all 0.3s ease;
         }
 
         /* --------------------------------------------- */
