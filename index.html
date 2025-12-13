@@ -8,7 +8,7 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <!-- <link href="reset.css" rel="stylesheet" /> -->
         <style>
-            html,
+            /* html,
             body {
                 overflow-x: hidden;
             }
@@ -38,99 +38,7 @@
 
             .table-rect {
                 border-radius: 8px;
-            }
-
-            /* --------------------------------------------- */
-            /* ANDROID-SAFE BLINKING ANIMATION (NO BOX-SHADOW) */
-            /* --------------------------------------------- */
-
-            @-webkit-keyframes blink-android-safe {
-
-                0%,
-                55% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-
-                56%,
-                100% {
-                    opacity: 0.35;
-                    transform: scale(1.1);
-                }
-            }
-
-            @-moz-keyframes blink-android-safe {
-
-                0%,
-                55% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-
-                56%,
-                100% {
-                    opacity: 0.35;
-                    transform: scale(1.1);
-                }
-            }
-
-            @-ms-keyframes blink-android-safe {
-
-                0%,
-                55% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-
-                56%,
-                100% {
-                    opacity: 0.35;
-                    transform: scale(1.1);
-                }
-            }
-
-            @-o-keyframes blink-android-safe {
-
-                0%,
-                55% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-
-                56%,
-                100% {
-                    opacity: 0.35;
-                    transform: scale(1.1);
-                }
-            }
-
-            @keyframes blink-android-safe {
-
-                0%,
-                55% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-
-                56%,
-                100% {
-                    opacity: 0.35;
-                    transform: scale(1.1);
-                }
-            }
-
-            .highlighted {
-                background-color: #a855f7 !important;
-                color: white !important;
-                border-color: #a855f7 !important;
-                -webkit-animation: blink-android-safe 0.7s ease-in-out 5;
-                -moz-animation: blink-android-safe 0.7s ease-in-out 5;
-                -ms-animation: blink-android-safe 0.7s ease-in-out 5;
-                -o-animation: blink-android-safe 0.7s ease-in-out 5;
-                animation: blink-android-safe 0.7s ease-in-out 5 !important;
-                z-index: 20;
-
-            }
+            } */
 
             :root {
                 -o-transition: all 0.3s ease;
@@ -654,9 +562,9 @@
             `;
                         div.addEventListener('click', () =>
                         {
-                            highlightTable(res.table.id);
                             searchResults.classList.add('hidden');
                             searchInput.value = '';
+                            highlightTable(res.table.id);
                         });
                         searchResults.appendChild(div);
                     });
