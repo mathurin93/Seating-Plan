@@ -580,41 +580,29 @@
                     el.classList.remove('highlighted');
                 });
 
-                requestAnimationFrame(() =>
+                const tableElement = document.querySelector(`[data-id="${tableId}"]`);
+                const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
+
+                if(!tableElement || !tableData) return;
+
+                // FRAME 1 → scroll only
+                // centerTableInView(tableElement);
+                tableElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+                // reset state
+                tableElement.classList.remove('highlighted');
+
+                // FRAME 4 → start blinking animation
+                tableElement.classList.add('highlighted');
+                const blinkAnimation = tableElement.getAnimations().find(anim => anim.animationName === "blink-android-safe");
+                if(!blinkAnimation) {
+                    return console.warn('No blink animation found on table element:', tableElement);
+                }
+                blinkAnimation.addEventListener('finish', () =>
                 {
-                    const tableElement = document.querySelector(`[data-id="${tableId}"]`);
-                    const tableData = tablesData.find(t => t.id == tableId || t.id == String(tableId));
-
-                    if(!tableElement || !tableData) return;
-
-                    // FRAME 1 → scroll only
-                    // centerTableInView(tableElement);
-                    tableElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-
-                    // allow scroll motion to settle BEFORE animation
-                    requestAnimationFrame(() =>
-                    {
-                        requestAnimationFrame(() =>
-                        {
-
-                            // reset state
-                            tableElement.classList.remove('highlighted');
-                            void tableElement.offsetWidth; // force reflow
-
-                            // FRAME 4 → start blinking animation
-                            tableElement.classList.add('highlighted');
-                            const blinkAnimation = tableElement.getAnimations().filter(anim => anim.animationName === "blink-android-safe").pop();
-                            if(!blinkAnimation) {
-                                console.warn('No blink animation found on table element:', tableElement);
-                                return;
-                            }
-                            blinkAnimation.onfinish = () =>
-                            {
-                                tableElement.classList.remove('highlighted');
-                                openModal(tableData);
-                            };
-                        });
-                    });
+                    // after animation ends, remove highlight
+                    openModal(tableData);
+                    tableElement.classList.remove('highlighted');
                 });
             }
 
