@@ -6,7 +6,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reception Seating Plan</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <!-- <link href="reset.css" rel="stylesheet" /> -->
         <style>
             html,
             body {
@@ -38,23 +37,6 @@
 
             .table-rect {
                 border-radius: 8px;
-            }
-
-            :root {
-                -o-transition: all 0.3s ease;
-                -moz-transition: all 0.3s ease;
-                -webkit-transition: all 0.3s ease;
-                -ms-transition: all 0.3s ease;
-                transition: all 0.3s ease;
-            }
-
-            .highlight {
-                background-color: #a855f7 !important;
-                color: white !important;
-                border-color: #a855f7 !important;
-                opacity: 0.35;
-                transform: scale(1.5);
-                z-index: 20;
             }
 
             /* --------------------------------------------- */
@@ -211,8 +193,9 @@
                 &larr; Go Back to Main Site
             </a>
         </footer>
-
+        <script src="https://cdn.jsdelivr.net/npm/animejs/dist/bundles/anime.umd.min.js"></script>
         <script>
+            const { animate } = anime;
             // --- Data: Tables & Guests ---
             const tablesData = [
                 { id: 'HT', label: 'Head Table', type: 'rect', pos: 'stage', guests: ["Brown David", "Brown Melleta"] },
@@ -517,15 +500,19 @@
                 // reset state
                 tableElement.classList.remove('highlighted');
 
-                // FRAME 4 → start blinking animation
-                let timeout = Number.NaN;
-                for(let i = 0; i < 8; i++) {
-                    tableElement.classList.toggle('highlight');
-                    await new Promise(res => timeout = setTimeout(res, 350));
-                    clearTimeout(timeout);
-                }
-                tableElement.classList.remove('highlight');
-                openModal(tableData);
+                animate(tableElement, {
+                    scale: [1, 1.5],
+                    borderColor: ['#fbbf24', '#f59e0b'],
+                    background:  '#A855F7',
+                    duration: 700,
+                    // easing: 'easeInOut',
+                    loop: 5,
+                    alternate: true,
+                    loopDelay: 200,
+                }).then(anim=>{
+                    openModal(tableData);
+                    anim.revert();
+                });
             }
 
 
