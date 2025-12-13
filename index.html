@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reception Seating Plan</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <!-- <link href="reset.css" rel="stylesheet" /> -->
         <style>
             html,
             body {
@@ -132,6 +133,10 @@
             }
 
             :root {
+                -o-transition: all 0.3s ease;
+                -moz-transition: all 0.3s ease;
+                -webkit-transition: all 0.3s ease;
+                -ms-transition: all 0.3s ease;
                 transition: all 0.3s ease;
             }
 
@@ -139,6 +144,8 @@
                 background-color: #a855f7 !important;
                 color: white !important;
                 border-color: #a855f7 !important;
+                opacity: 0.35;
+                transform: scale(1.5);
                 z-index: 20;
             }
 
