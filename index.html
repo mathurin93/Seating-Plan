@@ -129,7 +129,17 @@
                 animation: blink-android-safe 0.7s ease-in-out 5 !important;
                 z-index: 20;
 
+            }
+
+            :root {
                 transition: all 0.3s ease;
+            }
+
+            .highlight {
+                background-color: #a855f7 !important;
+                color: white !important;
+                border-color: #a855f7 !important;
+                z-index: 20;
             }
 
             /* --------------------------------------------- */
@@ -566,7 +576,7 @@
                 });
             }
 
-            function highlightTable(tableId)
+            async function highlightTable(tableId)
             {
                 if(currentHighlightTimeout) {
                     clearTimeout(currentHighlightTimeout);
@@ -593,17 +603,12 @@
                 tableElement.classList.remove('highlighted');
 
                 // FRAME 4 → start blinking animation
-                tableElement.classList.add('highlighted');
-                const blinkAnimation = tableElement.getAnimations().find(anim => anim.animationName === "blink-android-safe");
-                if(!blinkAnimation) {
-                    return console.warn('No blink animation found on table element:', tableElement);
+                for(let i = 0; i < 8; i++) {
+                    tableElement.classList.toggle('highlight');
+                    await new Promise(res => setTimeout(res, 350));
                 }
-                blinkAnimation.addEventListener('finish', () =>
-                {
-                    // after animation ends, remove highlight
-                    openModal(tableData);
-                    tableElement.classList.remove('highlighted');
-                });
+                tableElement.classList.remove('highlight');
+                openModal(tableData);
             }
 
 
