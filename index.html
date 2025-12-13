@@ -517,11 +517,11 @@
                         tableElement.classList.add('highlighted');
 
                         currentHighlightTimeout = setTimeout(() => {
-                            tableElement.classList.remove('highlighted');
-
+                            
                             setTimeout(() => {
                                 openModal(tableData);
                                 currentHighlightTimeout = null;
+                                tableElement.classList.remove('highlighted');
                             }, 150);
 
                         }, 3000); // <-- animation runs full 3 seconds on Samsung
