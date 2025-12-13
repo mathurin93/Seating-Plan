@@ -62,7 +62,8 @@
             background-color: #a855f7 !important;
             color: white !important;
             border-color: #a855f7 !important;
-            animation: blink-android-safe 0.7s ease-in-out infinite;
+            animation: blink-android-safe 0.7s ease-in-out 5;
+            /* animation-iteration-count: 5; */
             z-index: 20;
         }
 
@@ -224,11 +225,11 @@
         const tablesData = [
             { id: 'HT', label: 'Head Table', type: 'rect', pos: 'stage', guests: ["Brown David", "Brown Melleta"] },
 
-            { id: 1, type: 'rect', pos: 'r2-c7', guests: ["Brown Claud", "Edwards Gervan", "Edwards Marlene", "Ford Claudeth", "Linton Josephine", "Linton-Brown Jean", "Saunders Cynthia"]},
+            { id: 1, type: 'rect', pos: 'r2-c7', guests: ["Brown Claud", "Edwards Gervan", "Edwards Marlene", "Ford Claudeth", "Linton Josephine", "Linton-Brown Jean", "Saunders Cynthia"] },
             { id: 2, type: 'circle', pos: 'r1-c7', guests: ["Brown Deta", "Hackett Noel", "Hackett Olivien", "Henry Walcott", "Hibbert Melvina", "Lewis George", "Lynch Sofia", "Mcleod Eva", "Reid Dexter", "Reid Shirley"] },
-            { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Broomes Juann","Brown Charmaine", "Brown Errol", "Hackett Ann-Marie", "Hackette Daunte","Hackett Radcliffe", "Roban Victor","Hackett Vianne"] },
+            { id: 3, type: 'circle', pos: 'r2-c6', guests: ["Broomes Juann", "Brown Charmaine", "Brown Errol", "Hackett Ann-Marie", "Hackette Daunte", "Hackett Radcliffe", "Roban Victor", "Hackett Vianne"] },
             { id: 4, type: 'circle', pos: 'r1-c6', guests: ["Graham Diana", "Graham Paul", "Johnson Delroy", "Johnson June", "Reynolds Pauline", "Reynolds Roberts", "Severin Barbara", "Williams Bill", "Williams Janet"] },
-            { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Hurlock Winston","Treleven Marva", "Edwards Marvel","Wisdom Sandra"] },
+            { id: 5, type: 'circle', pos: 'r2-c4', guests: ["Clarke Eric", "Duff Clarence", "Duff Jacqueen", "Edwards Bobby", "Hibbert John Sr.", "Hurlock", "Hurlock Winston", "Treleven Marva", "Edwards Marvel", "Wisdom Sandra"] },
             { id: 6, type: 'circle', pos: 'r1-c4', guests: ["Blagrove Carol", "Blagrove Maurice", "Byfield Althea", "Byfield Devon", "Green Dawn", "Green Howard", "Mitchell Dion", "Mitchell Kedisha", "Rose Althea", "Rose Denrick"] },
             { id: 7, type: 'circle', pos: 'r2-c3', guests: ["Baptiste Delores", "Coppin Chileta", "Goodridge Angela", "Jackson Marcia", "Levy Ann Marie", "Levy Loyton", "Lewis Edward", "Mckoy Paulette", "Pitters Yvette", "Rattray Valerie"] },
             { id: 8, type: 'circle', pos: 'r1-c3', guests: ["Blair Dwayne", "Blair Patricia", "Butler Leroy", "Butler Wendy", "Douglas Gary", "Douglas Priscilla", "Ricketts Chase", "Ricketts Melonie", "Rose Andrew", "Rose Brenda"] },
@@ -236,7 +237,7 @@
             { id: 10, type: 'circle', pos: 'r1-c2', guests: ["Clemeston Doreen", "Clemeston Michelle", "Comrie Clive", "Duncan Clarence", "Duncan Lydia", "James Loraine", "Lorray Elizabeth", "Smith Desline", "Walsh Clifford"] },
             { id: 11, type: 'circle', pos: 'r2-c1', guests: ["Barrett Kingsley", "Barrett Lillian", "Dawns Dawn", "Ford Donna", "Lambert Sherril", "Marcia Clarke", "Peart Angie", "Peart Percy", "Williams Pauline", "Graham David"] },
             { id: 12, type: 'circle', pos: 'r1-c1', guests: ["Clemeston Kristine", "Clemeston Nazheme", "Gordon Janet", "Gordon Leroy", "Johnson Cara", "Longmore Daniel", "Lorray Sarah", "Williams Emma", "Peart Marc"] },
-            { id: 13, type: 'rect', pos: 'r3-c7', guests: ["Brown Laurie Ann", "Brown Vanessa", "Hibbert  Mark","Hibbert Maquieta", "James Aria", "James Desmond", "James Jayna", "James Natasha", "Sargeant Omari", "Sargeant Deborah"] },
+            { id: 13, type: 'rect', pos: 'r3-c7', guests: ["Brown Laurie Ann", "Brown Vanessa", "Hibbert  Mark", "Hibbert Maquieta", "James Aria", "James Desmond", "James Jayna", "James Natasha", "Sargeant Omari", "Sargeant Deborah"] },
             { id: 14, type: 'circle', pos: 'r4-c7', guests: ["Davis Cherell", "Davis Robert", "Foster Goldwyn", "Foster Jason", "Foster Shimyka", "Hibbert John Jr.", "Maxwell Noreen", "Newell Simone", "Reid Judeth"] },
             { id: 15, type: 'circle', pos: 'r3-c6', guests: ["Foster Justin", "Fraser Jalesa", "Fraser Jason", "Gordon Brandi", "Hackett Felicia", "Manhertz Brittney", "Manhertz Michael", "Robinson Bethany", "Robinson Mathurin", "Wisdom Corey"] },
             { id: 16, type: 'circle', pos: 'r4-c6', guests: ["Anderson Brittanya", "Anderson Keana", "Lynch Josiah", "Lynch Samantha", "Mushett Andrew", "Foster Jaida", "James Darius", "Lake Toriyah", "Wesley Jada"] },
@@ -503,7 +504,8 @@
                 if (!tableElement || !tableData) return;
 
                 // FRAME 1 → scroll only
-                centerTableInView(tableElement);
+                // centerTableInView(tableElement);
+                tableElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
 
                 // allow scroll motion to settle BEFORE animation
                 requestAnimationFrame(() => {
@@ -515,16 +517,15 @@
 
                         // FRAME 4 → start blinking animation
                         tableElement.classList.add('highlighted');
-
-                        currentHighlightTimeout = setTimeout(() => {
-                            
-                            setTimeout(() => {
-                                openModal(tableData);
-                                currentHighlightTimeout = null;
-                                tableElement.classList.remove('highlighted');
-                            }, 150);
-
-                        }, 3000); // <-- animation runs full 3 seconds on Samsung
+                        const blinkAnimation = tableElement.getAnimations().filter(anim => anim.animationName === "blink-android-safe").pop();
+                        if(!blinkAnimation) {
+                            console.warn('No blink animation found on table element:', tableElement);
+                            return;
+                        }
+                        blinkAnimation.onfinish = () => {
+                            tableElement.classList.remove('highlighted');
+                            openModal(tableData);
+                        };
                     });
                 });
             });
