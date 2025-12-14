@@ -638,23 +638,19 @@
                     inline: 'center'
                 });
 
-                // reset state
-                tableElement.classList.remove('highlighted');
-
-                tableElement.classList.add('highlight');
-                const ping = document.createElement("span")
-                ping.className = "absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400";
-                ping.style.top = "0.25em";
-                ping.style.right = "0.25em";
-                ping.style.width = "10%";
-                ping.style.height = "10%";
-                tableElement.appendChild(ping)
-                const timeout = setTimeout(() => {
-                    ping.remove();
-                    tableElement.classList.remove('highlight');
-                    openModal(tableData);
-                    clearTimeout(timeout);
-                }, 5_000);
+                animate(tableElement, {
+                        scale: [1, 1.2],
+                        borderColor: ['#fbbf24', '#f59e0b'],
+                        background:  '#A855F7',
+                        duration: 700,
+                        // easing: 'easeInOut',
+                        loop: 5,
+                        alternate: true,
+                        loopDelay: 200,
+                    }).then(anim=>{
+                        openModal(tableData);
+                        anim.revert();
+                    });
             }
 
 
