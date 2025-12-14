@@ -5,7 +5,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reception Seating Plan</title>
-        <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+        <script src="https://cdn.tailwindcss.com"></script>
         <style>
             html,
             body {
@@ -96,6 +96,39 @@
                 .table-rect {
                     height: 80% !important;
                 }
+            }
+
+            @keyframes blink-android-safe {
+
+                0%,
+                55% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+
+                56%,
+                100% {
+                    opacity: 0.35;
+                    transform: scale(1.1);
+                }
+            }
+
+            .highlighted {
+                background-color: #a855f7 !important;
+                color: white !important;
+                border-color: #a855f7 !important;
+                -webkit-animation: blink-android-safe 0.7s ease-in-out 5;
+                -moz-animation: blink-android-safe 0.7s ease-in-out 5;
+                -ms-animation: blink-android-safe 0.7s ease-in-out 5;
+                -o-animation: blink-android-safe 0.7s ease-in-out 5;
+                animation: blink-android-safe 0.7s ease-in-out 5 !important;
+                z-index: 20;
+
+                transition: all 0.3s ease;
+            }
+
+            :root {
+                --pulsate: blink-android-safe 0.7s ease-in-out 5;
             }
         </style>
 
@@ -500,19 +533,14 @@
                 // reset state
                 tableElement.classList.remove('highlighted');
 
-                animate(tableElement, {
-                    scale: [1, 1.5],
-                    borderColor: ['#fbbf24', '#f59e0b'],
-                    background:  '#A855F7',
-                    duration: 700,
-                    // easing: 'easeInOut',
-                    loop: 5,
-                    alternate: true,
-                    loopDelay: 200,
-                }).then(anim=>{
-                    openModal(tableData);
-                    anim.revert();
-                });
+                tableElement.classList.add('animate-[blink-android-safe_0.7s_ease-in-out_5]', 'highlighted');
+                tableElement.getAnimations()
+                    .find(a => a.animationName === 'blink-android-safe')
+                    ?.finished.then(() =>
+                    {
+                        tableElement.classList.remove('animate-[blink-android-safe_0.7s_ease-in-out_5]', 'highlighted');
+                        openModal(tableData);
+                    });
             }
 
 
