@@ -5,7 +5,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reception Seating Plan</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="main.css">
         <style>
             html,
             body {
@@ -124,11 +124,7 @@
                 animation: blink-android-safe 0.7s ease-in-out 5 !important;
                 z-index: 20;
 
-                transition: all 0.3s ease;
-            }
-
-            :root {
-                --pulsate: blink-android-safe 0.7s ease-in-out 5;
+                transition: all 0.7s ease;
             }
         </style>
 
@@ -533,14 +529,19 @@
                 // reset state
                 tableElement.classList.remove('highlighted');
 
-                tableElement.classList.add('animate-[blink-android-safe_0.7s_ease-in-out_5]', 'highlighted');
-                tableElement.getAnimations()
-                    .find(a => a.animationName === 'blink-android-safe')
-                    ?.finished.then(() =>
-                    {
-                        tableElement.classList.remove('animate-[blink-android-safe_0.7s_ease-in-out_5]', 'highlighted');
-                        openModal(tableData);
-                    });
+                animate(tableElement, {
+                    scale: [1, 1.5],
+                    borderColor: ['#fbbf24', '#f59e0b'],
+                    background:  '#A855F7',
+                    duration: 700,
+                    // easing: 'easeInOut',
+                    loop: 5,
+                    alternate: true,
+                    loopDelay: 200,
+                }).then(anim=>{
+                    openModal(tableData);
+                    anim.revert();
+                });
             }
 
 
