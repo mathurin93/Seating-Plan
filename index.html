@@ -6,128 +6,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reception Seating Plan</title>
         <link rel="stylesheet" href="main.css">
-        <style>
-            html,
-            body {
-                overflow-x: hidden;
-            }
-
-            .map-container {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-
-            .map-container::-webkit-scrollbar {
-                display: none;
-            }
-
-            .table-circle,
-            .table-rect {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.3s ease;
-                will-change: transform, opacity;
-            }
-
-            .table-circle {
-                border-radius: 50%;
-                aspect-ratio: 1 / 1;
-            }
-
-            .table-rect {
-                border-radius: 8px;
-            }
-
-            /* --------------------------------------------- */
-            /* FLOOR PLAN STYLES (unchanged) */
-            /* --------------------------------------------- */
-
-            .floor-area {
-                background-color: #3f3f46;
-                color: #d4d4d8;
-                font-weight: bold;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                font-size: 0.75rem;
-                border: none;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .floor-grid {
-                display: grid;
-                grid-template-columns: repeat(16, 1fr);
-                grid-template-rows: repeat(18, 1fr);
-                gap: 10px;
-                width: 100%;
-                max-width: 900px;
-                height: 900px;
-                background-color: #18181b;
-                border: 2px solid #27272a;
-                padding: 20px;
-                position: relative;
-                margin-bottom: 20px;
-            }
-
-            .scale-wrapper {
-                width: 100%;
-                overflow: auto;
-                position: relative;
-            }
-
-            @media (max-width: 768px) {
-                .floor-grid {
-                    grid-template-rows: repeat(14, 1fr);
-                    max-height: 650px;
-                    overflow: hidden;
-                    gap: 10px;
-                    width: calc(100vw - 2rem - 8px);
-                    min-width: 350px;
-                    padding: 10px;
-                    margin-bottom: 10px;
-                }
-
-                .table-circle {
-                    transform: scale(1.15);
-                }
-
-                .table-rect {
-                    height: 80% !important;
-                }
-            }
-
-            @keyframes blink-android-safe {
-
-                0%,
-                55% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-
-                56%,
-                100% {
-                    opacity: 0.35;
-                    transform: scale(1.1);
-                }
-            }
-
-            .highlighted {
-                background-color: #a855f7 !important;
-                color: white !important;
-                border-color: #a855f7 !important;
-                -webkit-animation: blink-android-safe 0.7s ease-in-out 5;
-                -moz-animation: blink-android-safe 0.7s ease-in-out 5;
-                -ms-animation: blink-android-safe 0.7s ease-in-out 5;
-                -o-animation: blink-android-safe 0.7s ease-in-out 5;
-                animation: blink-android-safe 0.7s ease-in-out 5 !important;
-                z-index: 20;
-
-                transition: all 0.7s ease;
-            }
-        </style>
-
     </head>
 
     <body class="bg-black text-zinc-300 font-sans min-h-screen flex flex-col">
@@ -529,19 +407,14 @@
                 // reset state
                 tableElement.classList.remove('highlighted');
 
-                animate(tableElement, {
-                    scale: [1, 1.5],
-                    borderColor: ['#fbbf24', '#f59e0b'],
-                    background:  '#A855F7',
-                    duration: 700,
-                    // easing: 'easeInOut',
-                    loop: 5,
-                    alternate: true,
-                    loopDelay: 200,
-                }).then(anim=>{
-                    openModal(tableData);
-                    anim.revert();
-                });
+                tableElement.classList.add('animate-[blink-android-safe_0.7s_ease-in-out_5]', 'highlighted');
+                tableElement.getAnimations()
+                    .find(a => a.animationName === 'blink-android-safe')
+                    ?.finished.then(() =>
+                    {
+                        tableElement.classList.remove('animate-[blink-android-safe_0.7s_ease-in-out_5]', 'highlighted');
+                        openModal(tableData);
+                    });
             }
 
 
