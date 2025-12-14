@@ -87,6 +87,8 @@
     --radius-lg: .5rem;
     --radius-xl: .75rem;
     --radius-2xl: 1rem;
+    --animate-ping: ping 1s cubic-bezier(0, 0, .2, 1) infinite;
+    --animate-bounce: bounce 1s infinite;
     --blur-sm: 8px;
     --default-transition-duration: .15s;
     --default-transition-timing-function: cubic-bezier(.4, 0, .2, 1);
@@ -475,6 +477,10 @@
     display: inline;
   }
 
+  .inline-flex {
+    display: inline-flex;
+  }
+
   .table {
     display: table;
   }
@@ -489,6 +495,10 @@
 
   .h-8 {
     height: calc(var(--spacing) * 8);
+  }
+
+  .h-full {
+    height: 100%;
   }
 
   .max-h-60 {
@@ -540,8 +550,12 @@
     transform: var(--tw-rotate-x, ) var(--tw-rotate-y, ) var(--tw-rotate-z, ) var(--tw-skew-x, ) var(--tw-skew-y, );
   }
 
-  .animate-\[blink-android-safe_0\.7s_ease-in-out_5\] {
-    animation: .7s ease-in-out 5 blink-android-safe;
+  .animate-bounce {
+    animation: var(--animate-bounce);
+  }
+
+  .animate-ping {
+    animation: var(--animate-ping);
   }
 
   .cursor-pointer {
@@ -676,6 +690,10 @@
 
   .border-zinc-900 {
     border-color: var(--color-zinc-900);
+  }
+
+  .bg-amber-400 {
+    background-color: var(--color-amber-400);
   }
 
   .bg-amber-900\/40 {
@@ -1158,7 +1176,6 @@ html, body {
 .highlighted {
   -ms-animation: blink-android-safe .7s ease-in-out 5;
   z-index: 20;
-  transition: all .3s;
   -webkit-animation: .7s ease-in-out 5 blink-android-safe;
   -moz-animation: .7s ease-in-out 5 blink-android-safe;
   -o-animation: .7s ease-in-out 5 blink-android-safe;
@@ -1166,6 +1183,17 @@ html, body {
   background-color: #a855f7 !important;
   border-color: #a855f7 !important;
   animation: .7s ease-in-out 5 blink-android-safe !important;
+}
+
+:root {
+  transition: all .3s;
+}
+
+.highlight {
+  z-index: 20;
+  color: #fff !important;
+  background-color: #a855f7 !important;
+  border-color: #a855f7 !important;
 }
 
 @property --tw-translate-x {
@@ -1366,4 +1394,23 @@ html, body {
 @property --tw-duration {
   syntax: "*";
   inherits: false
+}
+
+@keyframes ping {
+  75%, 100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    animation-timing-function: cubic-bezier(.8, 0, 1, 1);
+    transform: translateY(-25%);
+  }
+
+  50% {
+    animation-timing-function: cubic-bezier(0, 0, .2, 1);
+    transform: none;
+  }
 }
